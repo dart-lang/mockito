@@ -1,7 +1,7 @@
 library mockito;
 
 import 'dart:mirrors';
-
+import 'package:collection/equality.dart';
 import 'package:test/test.dart';
 
 
@@ -170,6 +170,8 @@ class InvocationMatcher {
       return roleArg._matcher.matches(actArg, {});
 //    } else if(roleArg is Mock){
 //      return identical(roleArg, actArg);
+    } else if(roleArg is List && actArg is List){
+      return new ListEquality().equals(roleArg, actArg);
     } else {
       return roleArg == actArg;
     }
