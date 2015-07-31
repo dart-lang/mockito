@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 class RealClass {
   String methodWithoutArgs() => "Real";
   String methodWithNormalArgs(int x) => "Real";
+  String methodWithListArgs(List x) => "Real";  
   String methodWithPositionalArgs(int x, [int y]) => "Real";
   String methodWithNamedArgs(int x, {int y}) => "Real";
   String methodWithTwoNamedArgs(int x, {int y, int z}) => "Real";
@@ -90,6 +91,11 @@ void main() {
       expect(mock.methodWithNormalArgs(43), isNull);
       expect(mock.methodWithNormalArgs(42), equals("Ultimate Answer"));
     });
+    test("should mock method with list args", (){
+      when(mock.methodWithListArgs([42])).thenReturn("Ultimate Answer");
+      expect(mock.methodWithListArgs([43]), isNull);
+      expect(mock.methodWithListArgs([42]), equals("Ultimate Answer"));
+    });    
     test("should mock method with positional args", () {
       when(mock.methodWithPositionalArgs(42, 17)).thenReturn("Answer and...");
       expect(mock.methodWithPositionalArgs(42), isNull);
@@ -124,6 +130,11 @@ void main() {
           .thenReturn("x y z");
       expect(mock.methodWithTwoNamedArgs(42, y:18, z:17), equals("x y z"));
     });
+    test("should mock method with any list argument matcher", (){
+      when(mock.methodWithListArgs(any)).thenReturn("A lot!");
+      expect(mock.methodWithListArgs([42]), equals("A lot!"));
+      expect(mock.methodWithListArgs([43]), equals("A lot!"));
+    });     
     test("should mock method with mix of argument matchers and real things",
         () {
       when(mock.methodWithPositionalArgs(argThat(greaterThan(100)), 17))
@@ -202,6 +213,13 @@ void main() {
       });
       verify(mock.methodWithNormalArgs(42));
     });
+    test("should verify method with List args", (){
+      mock.methodWithListArgs([42]);
+      expectFail("No matching calls. All calls: MockedClass.methodWithListArgs([42])", (){
+        verify(mock.methodWithListArgs([43]));
+      });
+      verify(mock.methodWithListArgs([42]));
+    });    
     test("should mock method with positional args", () {
       mock.methodWithPositionalArgs(42, 17);
       expectFail(
@@ -439,6 +457,10 @@ void main() {
       expect(verify(mock.methodWithNormalArgs(captureAny)).captured.single,
           equals(42));
     });
+    test("should captureOut list arguments", (){
+      mock.methodWithListArgs([42]);
+      expect(verify(mock.methodWithListArgs(captureAny)).captured.single, equals([42]));
+    });    
     test("should captureOut multiple arguments", () {
       mock.methodWithPositionalArgs(1, 2);
       expect(verify(
