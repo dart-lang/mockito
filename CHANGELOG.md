@@ -9,6 +9,7 @@
   going forward.
 * Deprecated `mockito_no_mirrors.dart`; replace with `mockito.dart`.
 * Require Dart SDK `>=1.21.0 <2.0.0` to use generic methods.
+* Add a new `throwOnMissingStub` method to the API.
 
 ## 1.0.1
 
