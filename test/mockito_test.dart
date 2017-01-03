@@ -620,13 +620,14 @@ void main() {
 
   group("throwOnMissingStub", () {
     test("should throw when a mock was called without a matching stub", () {
-      throwOnMissingStub(mock);
+      throwOnMissingStub(mock as Mock);
       when(mock.methodWithNormalArgs(42)).thenReturn("Ultimate Answer");
-      expect(() => mock.methodWithourArgs(), throwsUnimplementedError);
+      expect(() => (mock as MockedClass).methodWithoutArgs(),
+          throwsUnimplementedError);
     });
 
     test("should not throw when a mock was called with a matching stub", () {
-      throwOnMissingStub(mock);
+      throwOnMissingStub(mock as Mock);
       when(mock.methodWithoutArgs()).thenReturn("A");
       expect(() => mock.methodWithoutArgs(), returnsNormally);
     });
