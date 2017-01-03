@@ -102,12 +102,15 @@ class Mock {
     }
   }
 
+  @override
   int get hashCode => _givenHashCode == null ? 0 : _givenHashCode;
 
+  @override
   bool operator ==(other) => (_givenHashCode != null && other is Mock)
       ? _givenHashCode == other._givenHashCode
       : identical(this, other);
 
+  @override
   String toString() => _givenName != null ? _givenName : runtimeType.toString();
 }
 
@@ -126,11 +129,17 @@ Invocation _useTypedInvocationIfSet(Invocation invocation) {
 /// An Invocation implementation that takes arguments from [_typedArgs] and
 /// [_typedNamedArgs].
 class _InvocationForTypedArguments extends Invocation {
+  @override
   final Symbol memberName;
+  @override
   final Map<Symbol, dynamic> namedArguments;
+  @override
   final List<dynamic> positionalArguments;
+  @override
   final bool isGetter;
+  @override
   final bool isMethod;
+  @override
   final bool isSetter;
 
   factory _InvocationForTypedArguments(Invocation invocation) {
@@ -406,6 +415,7 @@ class RealCall {
 
   RealCall(this.mock, this.invocation) : timeStamp = _timer.now();
 
+  @override
   String toString() {
     var args = invocation.positionalArguments
         .map((v) => v == null ? "null" : v.toString())
