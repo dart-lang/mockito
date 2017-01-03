@@ -24,11 +24,12 @@ import 'mock.dart' show CannedResponse, Mock, setDefaultResponse;
 ///     var mockAnimal = new MockAnimal();
 ///     var realAnimal = new RealAnimal();
 ///     spy(mockAnimal, realAnimal);
-/*=E*/ spy/*<E>*/(Mock mock, Object /*=E*/ spyOn) {
+/*=E*/ spy/*<E>*/(Mock mock, Object/*=E*/ spyOn) {
   var mirror = reflect(spyOn);
   setDefaultResponse(
       mock,
       () => new CannedResponse(null,
           (Invocation realInvocation) => mirror.delegate(realInvocation)));
-  return mock;
+  // No reified types for generic methods yet, so silence the warning below.
+  return mock; // ignore: return_of_invalid_type
 }

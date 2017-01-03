@@ -20,7 +20,7 @@ import 'package:test/test.dart';
 
 bool _whenInProgress = false;
 bool _verificationInProgress = false;
-_WhenCall _whenCall = null;
+_WhenCall _whenCall;
 final List<_VerifyCall> _verifyCalls = <_VerifyCall>[];
 final _TimeStampProvider _timer = new _TimeStampProvider();
 final List _capturedArgs = [];
@@ -70,8 +70,8 @@ class Mock {
 
   final List<RealCall> _realCalls = <RealCall>[];
   final List<CannedResponse> _responses = <CannedResponse>[];
-  String _givenName = null;
-  int _givenHashCode = null;
+  String _givenName;
+  int _givenHashCode;
 
   _ReturnsCannedResponse _defaultResponse = _nullResponse;
 
