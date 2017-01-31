@@ -38,8 +38,7 @@ void setDefaultResponse(Mock mock, CallPair defaultResponse()) {
 ///
 /// The default behavior when not using this is to always return `null`.
 void throwOnMissingStub(Mock mock) {
-  mock._defaultResponse =
-      () => new CallPair.allInvocations(mock._noSuchMethodSuper);
+  mock._defaultResponse = () => new CallPair.allInvocations(mock._noSuchMethod);
 }
 
 /// Extend or mixin this class to mark the implementation as a [Mock].
@@ -113,7 +112,8 @@ class Mock {
     }
   }
 
-  _noSuchMethodSuper(Invocation invocation) => super.noSuchMethod(invocation);
+  _noSuchMethod(Invocation invocation) =>
+      const Object().noSuchMethod(invocation);
 
   @override
   int get hashCode => _givenHashCode == null ? 0 : _givenHashCode;
