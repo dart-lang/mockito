@@ -49,7 +49,7 @@ between them.
   });
 ```
 
-** ISS Spotter**
+**ISS Spotter**
 : Stubs `IssLocator.currentPosition()` using `when().thenReturn()`.
 Calling currentPosition() then returns the predefined location for the
 space station. Evaluate whether the space station is visible from a
