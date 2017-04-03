@@ -17,7 +17,7 @@ import 'dart:math';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'package:testing_example/iss.dart';
+import 'iss.dart';
 
 // The Mock class uses noSuchMethod to catch all method invocations.
 // The @proxy annotation indicates that noSuchMethod calls should be
