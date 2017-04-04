@@ -40,6 +40,8 @@ between them.
       Point<double> london = new Point(51.5073, -0.1277);
       Point<double> paris = new Point(48.8566, 2.3522);
       double d = sphericalDistanceKm(london, paris);
+      // London should be approximatley 343.5km
+      // (+/- 0.1km) from Paris.
       expect(d, closeTo(343.5, 0.1));
     });
 
@@ -47,6 +49,8 @@ between them.
       Point<double> sf = new Point(37.783333, -122.416667);
       Point<double> mtv = new Point(37.389444, -122.081944);
       double d = sphericalDistanceKm(sf, mtv);
+      // San Francisco should be approximatley 52.8km
+      // (+/- 0.1km) from Mountain View.
       expect(d, closeTo(52.8, 0.1));
     });
   });
@@ -83,4 +87,15 @@ This test runs asynchronously.
     });
   });
 ```
+
+---
+
+## Files
+
+* [iss.dart](https://raw.githubusercontent.com/dart-lang/mockito/master/test/example/iss/iss.dart)
+: International space station API library
+
+* [iss_test.dart](https://raw.githubusercontent.com/dart-lang/mockito/master/test/example/iss/iss_test.dart)
+: Unit tests for iss.dart library
+
 
