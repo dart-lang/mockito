@@ -12,9 +12,11 @@ expected outcome.
 The ISS library, `iss.dart`, consists of two classes:
 
 **IssLocator**
+
 : Fetches the current GPS position directly under the space station.
 
 **IssSpotter**
+
 : Performs calculations from the observer's location on earth.
 
 ---
@@ -31,6 +33,7 @@ class MockIssLocator extends Mock implements IssLocator {}
 The tests check for two scenarios:
 
 **Spherical distance**
+
 : Given two predefined points on earth, verify the calculated distance
 between them.
 
@@ -57,6 +60,7 @@ between them.
 ```
 
 **ISS Spotter**
+
 : Stubs `IssLocator.currentPosition` using `when().thenReturn()`.
 Evaluate whether the space station (using a predefined location)
 is visible from a second predefined location.
