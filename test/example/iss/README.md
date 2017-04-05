@@ -12,11 +12,9 @@ expected outcome.
 The ISS library, `iss.dart`, consists of two classes:
 
 **IssLocator**
-
 : Fetches the current GPS position directly under the space station.
 
 **IssSpotter**
-
 : Performs calculations from the observer's location on earth.
 
 ---
@@ -35,7 +33,6 @@ class MockIssLocator extends Mock implements IssLocator {}
 The tests check for two scenarios:
 
 **Spherical distance**
-
 : Given two predefined points on earth, verify the calculated distance
 between them.
 
@@ -45,7 +42,7 @@ between them.
       Point<double> london = new Point(51.5073, -0.1277);
       Point<double> paris = new Point(48.8566, 2.3522);
       double d = sphericalDistanceKm(london, paris);
-      // London should be approximatley 343.5km
+      // London should be approximately 343.5km
       // (+/- 0.1km) from Paris.
       expect(d, closeTo(343.5, 0.1));
     });
@@ -54,7 +51,7 @@ between them.
       Point<double> sf = new Point(37.783333, -122.416667);
       Point<double> mtv = new Point(37.389444, -122.081944);
       double d = sphericalDistanceKm(sf, mtv);
-      // San Francisco should be approximatley 52.8km
+      // San Francisco should be approximately 52.8km
       // (+/- 0.1km) from Mountain View.
       expect(d, closeTo(52.8, 0.1));
     });
@@ -62,7 +59,6 @@ between them.
 ```
 
 **ISS Spotter**
-
 : Stubs `IssLocator.currentPosition` using `when().thenReturn()`.
 Evaluate whether the space station (using a predefined location)
 is visible from a second predefined location.
