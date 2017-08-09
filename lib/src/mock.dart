@@ -23,10 +23,10 @@ import 'package:mockito/src/invocation_matcher.dart';
 import 'package:test/test.dart';
 
 bool _whenInProgress = false;
-bool _waitForInProgress = false;
+bool _untilCalledInProgress = false;
 bool _verificationInProgress = false;
 _WhenCall _whenCall;
-_WaitForCall _waitForCall;
+_UntilCall _untilCall;
 final List<_VerifyCall> _verifyCalls = <_VerifyCall>[];
 final _TimeStampProvider _timer = new _TimeStampProvider();
 final List _capturedArgs = [];
@@ -109,8 +109,8 @@ class Mock {
     } else if (_verificationInProgress) {
       _verifyCalls.add(new _VerifyCall(this, invocation));
       return null;
-    } else if (_waitForInProgress) {
-      _waitForCall = new _WaitForCall(this, invocation);
+    } else if (_untilCalledInProgress) {
+      _untilCall = new _UntilCall(this, invocation);
       return null;
     } else {
       _realCalls.add(new RealCall(this, invocation));
@@ -480,11 +480,11 @@ class _WhenCall {
   }
 }
 
-class _WaitForCall {
+class _UntilCall {
   final InvocationMatcher _invocationMatcher;
   final Mock _mock;
 
-  _WaitForCall(this._mock, Invocation invocation)
+  _UntilCall(this._mock, Invocation invocation)
       : _invocationMatcher = new InvocationMatcher(invocation);
 
   bool _matchesInvocation(RealCall realCall) =>
@@ -749,17 +749,17 @@ typedef Future<Invocation> InvocationLoader(_);
 ///
 /// ```dart
 /// cat.eatFood("fish");
-/// await waitFor(cat.chew());
+/// await untilCalled(cat.chew());
 /// ```
 ///
-/// In the above example, the waitFor(cat.chew()) will complete only when that
-/// method is called. If the given invocation has already been called, the
+/// In the above example, the untilCalled(cat.chew()) will complete only when
+/// that method is called. If the given invocation has already been called, the
 /// future will return immediately.
-InvocationLoader get waitFor {
-  _waitForInProgress = true;
+InvocationLoader get untilCalled {
+  _untilCalledInProgress = true;
   return (_) {
-    _waitForInProgress = false;
-    return _waitForCall.invocationFuture;
+    _untilCalledInProgress = false;
+    return _untilCall.invocationFuture;
   };
 }
 
@@ -784,8 +784,10 @@ void logInvocations(List<Mock> mocks) {
 /// or in `tearDown`.
 void resetMockitoState() {
   _whenInProgress = false;
+  _untilCalledInProgress = false;
   _verificationInProgress = false;
   _whenCall = null;
+  _untilCall = null;
   _verifyCalls.clear();
   _capturedArgs.clear();
   _typedArgs.clear();
