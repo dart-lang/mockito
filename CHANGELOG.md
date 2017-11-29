@@ -1,7 +1,7 @@
 ## 2.3.0
 
-* `thenReturn` now asserts that neither a `Future` nor `Stream` is provided.
-  `thenReturn` calls with futures and streams should be changed to
+* `thenReturn` now throws an `ArgumentError` if either a `Future` or `Stream`
+  is provided. `thenReturn` calls with futures and streams should be changed to
   `thenAnswer`. See the README for more information.
 
 ## 2.2.0

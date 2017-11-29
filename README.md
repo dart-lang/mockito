@@ -92,8 +92,9 @@ or sometimes when argument matchers are used, etc.
 
 ### A quick word on async stubbing
 
-**Using `thenReturn` to return a `Future` or `Stream` will throw an assertion
-error.** This is because it can lead to unexpected behaviors. For example:
+**Using `thenReturn` to return a `Future` or `Stream` will throw an
+`ArgumentError`.** This is because it can lead to unexpected behaviors. For
+example:
 
 * If the method is stubbed in a different zone than the zone that consumes the
   `Future`, unexpected behavior could occur.

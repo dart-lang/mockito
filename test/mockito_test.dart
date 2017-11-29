@@ -292,14 +292,14 @@ void main() {
       expect(
           () => when(mock.methodReturningFuture())
               .thenReturn(new Future.value("stub")),
-          throwsA(new isInstanceOf<AssertionError>()));
+          throwsArgumentError);
     });
 
     test("thenReturn throws if provided Stream", () {
       expect(
           () => when(mock.methodReturningStream())
               .thenReturn(new Stream.fromIterable(["stub"])),
-          throwsA(new isInstanceOf<AssertionError>()));
+          throwsArgumentError);
     });
 
     test("thenAnswer supports stubbing method returning a Future", () async {

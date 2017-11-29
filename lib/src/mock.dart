@@ -301,14 +301,16 @@ void clearInteractions(var mock) {
 
 class PostExpectation {
   thenReturn(expected) {
-    assert(
-        expected is! Future,
-        '`thenReturn` should not be used to return a Future. '
-        'Instead, use `thenAnswer((_) => future)`.');
-    assert(
-        expected is! Stream,
-        '`thenReturn` should not be used to return a Stream. '
-        'Instead, use `thenAnswer((_) => stream)`.');
+    if (expected is Future) {
+      throw new ArgumentError(
+          '`thenReturn` should not be used to return a Future. '
+          'Instead, use `thenAnswer((_) => future)`.');
+    }
+    if (expected is Stream) {
+      throw new ArgumentError(
+          '`thenReturn` should not be used to return a Stream. '
+          'Instead, use `thenAnswer((_) => stream)`.');
+    }
     return _completeWhen((_) => expected);
   }
 
