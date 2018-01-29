@@ -607,9 +607,13 @@ class VerificationResult {
 
 typedef dynamic Answering(Invocation realInvocation);
 
-typedef VerificationResult Verification(matchingInvocations);
+/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
+/// you can do `verify(m.voidFn())`. Subject to change.
+typedef Verification = VerificationResult Function<T>(T matchingInvocations);
 
-typedef void _InOrderVerification(List<dynamic> recordedInvocations);
+/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
+/// you can do `verifyInOrder([m.voidFn(), m.voidFnToo()])`. Subject to change.
+typedef _InOrderVerification = void Function<T>(List<T> recordedInvocations);
 
 /// Verify that a method on a mock object was never called with the given
 /// arguments.
@@ -655,7 +659,7 @@ Verification _makeVerify(bool never) {
     throw new StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return (mock) {
+  return <T>(T mock) {
     _verificationInProgress = false;
     if (_verifyCalls.length == 1) {
       _VerifyCall verifyCall = _verifyCalls.removeLast();
@@ -674,7 +678,7 @@ _InOrderVerification get verifyInOrder {
     throw new StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return (List<dynamic> _) {
+  return <T>(List<T> _) {
     _verificationInProgress = false;
     DateTime dt = new DateTime.fromMillisecondsSinceEpoch(0);
     var tmpVerifyCalls = new List<_VerifyCall>.from(_verifyCalls);
@@ -720,7 +724,9 @@ void verifyZeroInteractions(var mock) {
   }
 }
 
-typedef PostExpectation Expectation(x);
+/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
+/// you can do `when(m.voidFn()).thenAnswer(...)`. Subject to change.
+typedef Expectation = PostExpectation Function<T>(T x);
 
 /// Create a stub method response.
 ///
@@ -744,7 +750,7 @@ Expectation get when {
     throw new StateError('Cannot call `when` within a stub response');
   }
   _whenInProgress = true;
-  return (_) {
+  return <T>(T _) {
     _whenInProgress = false;
     return new PostExpectation();
   };
