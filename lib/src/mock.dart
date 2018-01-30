@@ -607,12 +607,8 @@ class VerificationResult {
 
 typedef dynamic Answering(Invocation realInvocation);
 
-/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
-/// you can do `verify(m.voidFn())`. Subject to change.
 typedef Verification = VerificationResult Function<T>(T matchingInvocations);
 
-/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
-/// you can do `verifyInOrder([m.voidFn(), m.voidFnToo()])`. Subject to change.
 typedef _InOrderVerification = void Function<T>(List<T> recordedInvocations);
 
 /// Verify that a method on a mock object was never called with the given
@@ -724,8 +720,6 @@ void verifyZeroInteractions(var mock) {
   }
 }
 
-/// Future-proofing: `<T>` may, in dart 2, allow assignment of "void", so that
-/// you can do `when(m.voidFn()).thenAnswer(...)`. Subject to change.
 typedef Expectation = PostExpectation Function<T>(T x);
 
 /// Create a stub method response.
