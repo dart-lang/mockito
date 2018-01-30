@@ -750,7 +750,7 @@ Expectation get when {
   };
 }
 
-typedef Future<Invocation> InvocationLoader(_);
+typedef InvocationLoader = Future<Invocation> Function<T>(T _);
 
 /// Returns a future [Invocation] that will complete upon the first occurrence
 /// of the given invocation.
@@ -767,7 +767,7 @@ typedef Future<Invocation> InvocationLoader(_);
 /// future will return immediately.
 InvocationLoader get untilCalled {
   _untilCalledInProgress = true;
-  return (_) {
+  return <T>(T _) {
     _untilCalledInProgress = false;
     return _untilCall.invocationFuture;
   };
