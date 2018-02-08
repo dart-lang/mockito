@@ -305,6 +305,16 @@ void clearInteractions(var mock) {
 
 class PostExpectation {
   thenReturn(expected) {
+    if (expected is Future) {
+      throw new ArgumentError(
+          '`thenReturn` should not be used to return a Future. '
+          'Instead, use `thenAnswer((_) => future)`.');
+    }
+    if (expected is Stream) {
+      throw new ArgumentError(
+          '`thenReturn` should not be used to return a Stream. '
+          'Instead, use `thenAnswer((_) => stream)`.');
+    }
     return _completeWhen((_) => expected);
   }
 
@@ -609,9 +619,9 @@ class VerificationResult {
 
 typedef dynamic Answering(Invocation realInvocation);
 
-typedef VerificationResult Verification(matchingInvocations);
+typedef Verification = VerificationResult Function<T>(T matchingInvocations);
 
-typedef void _InOrderVerification(List<dynamic> recordedInvocations);
+typedef _InOrderVerification = void Function<T>(List<T> recordedInvocations);
 
 /// Verify that a method on a mock object was never called with the given
 /// arguments.
@@ -657,7 +667,7 @@ Verification _makeVerify(bool never) {
     throw new StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return (mock) {
+  return <T>(T mock) {
     _verificationInProgress = false;
     if (_verifyCalls.length == 1) {
       _VerifyCall verifyCall = _verifyCalls.removeLast();
@@ -676,7 +686,7 @@ _InOrderVerification get verifyInOrder {
     throw new StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return (List<dynamic> _) {
+  return <T>(List<T> _) {
     _verificationInProgress = false;
     DateTime dt = new DateTime.fromMillisecondsSinceEpoch(0);
     var tmpVerifyCalls = new List<_VerifyCall>.from(_verifyCalls);
@@ -722,7 +732,7 @@ void verifyZeroInteractions(Mock mock) {
   }
 }
 
-typedef PostExpectation Expectation(x);
+typedef Expectation = PostExpectation Function<T>(T x);
 
 /// Create a stub method response.
 ///
@@ -746,13 +756,13 @@ Expectation get when {
     throw new StateError('Cannot call `when` within a stub response');
   }
   _whenInProgress = true;
-  return (_) {
+  return <T>(T _) {
     _whenInProgress = false;
     return new PostExpectation();
   };
 }
 
-typedef Future<Invocation> InvocationLoader(_);
+typedef InvocationLoader = Future<Invocation> Function<T>(T _);
 
 /// Returns a future [Invocation] that will complete upon the first occurrence
 /// of the given invocation.
@@ -769,7 +779,7 @@ typedef Future<Invocation> InvocationLoader(_);
 /// future will return immediately.
 InvocationLoader get untilCalled {
   _untilCalledInProgress = true;
-  return (_) {
+  return <T>(T _) {
     _untilCalledInProgress = false;
     return _untilCall.invocationFuture;
   };
