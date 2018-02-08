@@ -105,7 +105,7 @@ String noMatchingCallsFooter = "(If you called `verify(...).called(0);`, "
     "please instead use `verifyNever(...);`.)";
 
 void main() {
-  RealClass mock;
+  MockedClass mock;
 
   setUp(() {
     mock = new MockedClass();
@@ -921,16 +921,16 @@ void main() {
 
   group("throwOnMissingStub", () {
     test("should throw when a mock was called without a matching stub", () {
-      throwOnMissingStub(mock as Mock);
+      throwOnMissingStub(mock);
       when(mock.methodWithNormalArgs(42)).thenReturn("Ultimate Answer");
       expect(
-        () => (mock as MockedClass).methodWithoutArgs(),
+        () => (mock).methodWithoutArgs(),
         throwsNoSuchMethodError,
       );
     });
 
     test("should not throw when a mock was called with a matching stub", () {
-      throwOnMissingStub(mock as Mock);
+      throwOnMissingStub(mock);
       when(mock.methodWithoutArgs()).thenReturn("A");
       expect(() => mock.methodWithoutArgs(), returnsNormally);
     });

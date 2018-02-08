@@ -129,12 +129,12 @@ If an argument other than an ArgMatcher (like `any`, `anyNamed()`, `argThat`,
 used for argument matching. If you need more strict matching consider use
 `argThat(identical(arg))`.
 
-Also note that `null` cannot be used as an argument adjascent to ArgMatcher
+However, note that `null` cannot be used as an argument adjacent to ArgMatcher
 arguments, nor as an un-wrapped value passed as a named argument. For example:
 
 ```dart
 verify(cat.hunt("back yard", null)); // OK: no ArgMatchers.
-verify(cat.hunt(argThat(contains("yard")), null)); // BAD: adjascent null.
+verify(cat.hunt(argThat(contains("yard")), null)); // BAD: adjacent null.
 verify(cat.hunt(argThat(contains("yard")), argThat(isNull))); // OK: wrapped in ArgMatcher.
 verify(cat.eatFood("Milk", hungry: null)); // BAD: null as named argument.
 verify(cat.eatFood("Milk", hungry: argThat(isNull))); // BAD: null as named argument.
@@ -143,8 +143,10 @@ verify(cat.eatFood("Milk", hungry: argThat(isNull))); // BAD: null as named argu
 ## Named arguments
 
 Mockito currently has an awkward nuisance to it's syntax: named arguments and
-argument matchers require more specification than you might think. Namely, you
-must declare the name of the argument in the arguent matcher:
+argument matchers require more specification than you might think: you must
+declare the name of the argument in the argument matcher. This is because we
+can't rely on the position of a named argument, and the language doesn't
+provide a mechanism to answer "Is this element being used as a named element?"
 
 ```dart
 // GOOD: argument matchers include their names.
