@@ -209,9 +209,9 @@ class _InvocationForMatchedArguments extends Invocation {
           // Incorrect usage of an ArgMatcher, something like:
           // `when(obj.fn(a: any))`.
           throw new ArgumentError(
-              'A matched argument (or a null value) was passed in as a named '
+              'An ArgumentMatcher (or a null value) was passed in as a named '
               'argument named "$name", but was not passed a value for `named`. '
-              'Each matched argument that is passed as a named argument needs '
+              'Each ArgumentMatcher that is passed as a named argument needs '
               'to specify the `named` argument, and each null value must be '
               'wrapped in an ArgMatcher. For example: '
               '`when(obj.fn(x: anyNamed("x")))` or '
@@ -229,14 +229,14 @@ class _InvocationForMatchedArguments extends Invocation {
       Symbol nameSymbol = new Symbol(name);
       if (!invocation.namedArguments.containsKey(nameSymbol)) {
         throw new ArgumentError(
-            'A matched argument was declared as named $name, but was not '
+            'An ArgumentMatcher was declared as named $name, but was not '
             'passed as an argument named $name.\n\n'
             'BAD:  when(obj.fn(anyNamed: "a")))\n'
             'GOOD: when(obj.fn(a: anyNamed: "a")))');
       }
       if (invocation.namedArguments[nameSymbol] != null) {
         throw new ArgumentError(
-            'A matched argument was declared as named $name, but a different '
+            'An ArgumentMatcher was declared as named $name, but a different '
             'value (${invocation.namedArguments[nameSymbol]}) was passed as '
             '$name.\n\n'
             'BAD:  when(obj.fn(b: anyNamed("a")))\n'
@@ -590,7 +590,8 @@ Null argThat(Matcher matcher, {String named}) =>
 Null captureThat(Matcher matcher, {String named}) =>
     _registerMatcher(matcher, true, named: named);
 
-ArgMatcher typed<T>(ArgMatcher matcher, {String named}) => matcher;
+@Deprecated('ArgMatchers no longer need to be wrapped in Mockito 3.0')
+Null typed<T>(ArgMatcher matcher, {String named}) => null;
 
 Null _registerMatcher(Matcher matcher, bool capture, {String named}) {
   var argMatcher = new ArgMatcher(matcher, capture);
@@ -718,14 +719,14 @@ _InOrderVerification get verifyInOrder {
   };
 }
 
-void verifyNoMoreInteractions(Mock mock) {
+void verifyNoMoreInteractions(var mock) {
   var unverified = mock._realCalls.where((inv) => !inv.verified).toList();
   if (unverified.isNotEmpty) {
     fail("No more calls expected, but following found: " + unverified.join());
   }
 }
 
-void verifyZeroInteractions(Mock mock) {
+void verifyZeroInteractions(var mock) {
   if (mock._realCalls.isNotEmpty) {
     fail("No interaction expected, but following found: " +
         mock._realCalls.join());
