@@ -706,7 +706,8 @@ _InOrderVerification get verifyInOrder {
   };
 }
 
-void _throwMockArgumentError(method) => throw new ArgumentError('$method must only be given a Mock object');
+void _throwMockArgumentError(method) =>
+    throw new ArgumentError('$method must only be given a Mock object');
 
 void verifyNoMoreInteractions(var mock) {
   if (mock is! Mock) _throwMockArgumentError('verifyNoMoreInteractions');
