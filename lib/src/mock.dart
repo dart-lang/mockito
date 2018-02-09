@@ -563,11 +563,11 @@ class ArgMatcher {
 }
 
 /// An argument matcher that matches any argument passed in "this" position.
-get any => new ArgMatcher(anything, false);
+ArgMatcher get any => new ArgMatcher(anything, false);
 
 /// An argument matcher that matches any argument passed in "this" position, and
 /// captures the argument for later access with `captured`.
-get captureAny => new ArgMatcher(anything, true);
+ArgMatcher get captureAny => new ArgMatcher(anything, true);
 
 /// An argument matcher that matches an argument that matches [matcher].
 argThat(Matcher matcher) => new ArgMatcher(matcher, false);
