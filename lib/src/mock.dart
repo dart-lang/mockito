@@ -208,6 +208,10 @@ class _InvocationForMatchedArguments extends Invocation {
         if (!_storedNamedArgSymbols.contains(name)) {
           // Incorrect usage of an ArgMatcher, something like:
           // `when(obj.fn(a: any))`.
+
+          // Clear things out for the next call.
+          _storedArgs.clear();
+          _storedNamedArgs.clear();
           throw new ArgumentError(
               'An ArgumentMatcher (or a null value) was passed in as a named '
               'argument named "$name", but was not passed a value for `named`. '
@@ -228,6 +232,9 @@ class _InvocationForMatchedArguments extends Invocation {
     _storedNamedArgs.forEach((name, arg) {
       Symbol nameSymbol = new Symbol(name);
       if (!invocation.namedArguments.containsKey(nameSymbol)) {
+        // Clear things out for the next call.
+        _storedArgs.clear();
+        _storedNamedArgs.clear();
         throw new ArgumentError(
             'An ArgumentMatcher was declared as named $name, but was not '
             'passed as an argument named $name.\n\n'
@@ -235,6 +242,9 @@ class _InvocationForMatchedArguments extends Invocation {
             'GOOD: when(obj.fn(a: anyNamed: "a")))');
       }
       if (invocation.namedArguments[nameSymbol] != null) {
+        // Clear things out for the next call.
+        _storedArgs.clear();
+        _storedNamedArgs.clear();
         throw new ArgumentError(
             'An ArgumentMatcher was declared as named $name, but a different '
             'value (${invocation.namedArguments[nameSymbol]}) was passed as '
@@ -253,6 +263,9 @@ class _InvocationForMatchedArguments extends Invocation {
     var nullPositionalArguments =
         invocation.positionalArguments.where((arg) => arg == null);
     if (_storedArgs.length != nullPositionalArguments.length) {
+      // Clear things out for the next call.
+      _storedArgs.clear();
+      _storedNamedArgs.clear();
       throw new ArgumentError(
           'null arguments are not allowed alongside ArgMatchers; use '
           '"argThat(isNull)"');

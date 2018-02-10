@@ -291,6 +291,9 @@ void main() {
         when(mock.methodWithPositionalArgs(argThat(equals(42)), null))
             .thenReturn("99");
       }, throwsArgumentError);
+
+      // but doesn't ruin later calls.
+      when(mock.methodWithNormalArgs(43)).thenReturn("43");
     });
 
     test("thenReturn throws if provided Future", () {
