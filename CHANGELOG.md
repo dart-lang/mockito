@@ -1,3 +1,8 @@
+## 2.2.3
+
+* Avoid generlized void isses. Fixes Mockito's compliance with Dart SDK
+  2.0.0-dev.23.0.
+
 ## 2.2.2
 
 * Remove last violation of `USES_DYNAMIC_AS_BOTTOM` error. This should make
