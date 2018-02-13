@@ -15,7 +15,7 @@ In this code, Mockito is not passing a String as the first argument to
 `eatFood()`, nor a bool as `hungry:`, which is what the method expects.
 Instead, Mockito passes an ArgumentMatcher, a completely different object from
 a String or bool! This is no longer allowed in Dart 2.  As an interim solution,
-Mockito 1.0.0 sported an awkward `typed` function, which wrapped other Mockito
+Mockito 1.0.0 sports an awkward `typed` function, which wraps other Mockito
 functions, in order to simulate using the Dart 2-safe implementation:
 
 ```dart
@@ -43,25 +43,24 @@ Mockito 3 API calls:
 
 ## Table
 
-|     |                                                                       |
+| Version |                                                                   |
 | --- | --------------------------------------------------------------------- |
+|     | Using argument matchers as positional arguments                       |
 | 2.x | `when(obj.fn(typed(any)))...`                                         |
 | 3.0 | `when(obj.fn(any))...`                                                |
-|                                                                             |
+| 2.x | `when(obj.fn(typed(argThat(equals(7)))))...`                          |
+| 3.0 | `when(obj.fn(argThat(equals(7))))...`                                 |
+|     | Using argument matchers as named arguments                            |
 | 2.x | `when(obj.fn(foo: typed(any, named: 'foo')))...`                      |
 | 3.0 | `when(obj.fn(foo: anyNamed('foo')))...`                               |
-|                                                                             |
 | 2.x | `when(obj.fn(foo: typed(argThat(equals(7)), named: 'foo')))...`       |
 | 3.0 | `when(obj.fn(foo: argThat(equals(7), named: 'foo')))...`              |
-|                                                                             |
 | 2.x | `when(obj.fn(foo: typed(null, named: 'foo')))...`                     |
 | 3.0 | `when(obj.fn(foo: argThat(isNull, named: 'foo')))...`                 |
-|                                                                             |
 | 2.x | `when(obj.fn(foo: typed(captureAny, named: 'foo')))...`               |
 | 3.0 | `when(obj.fn(foo: captureAnyNamed('foo')))...`                        |
-|                                                                             |
-| 2.x | `when(obj.fn(foo: typed(captureThat(equals(7)), named: 'foo')))...`               |
-| 3.0 | `when(obj.fn(foo: captureThatNamed(equals(7), 'foo')))...`                        |
+| 2.x | `when(obj.fn(foo: typed(captureThat(equals(7)), named: 'foo')))...`   |
+| 3.0 | `when(obj.fn(foo: captureThatNamed(equals(7), 'foo')))...`            |
 
 ## Mockito 2.3 - a backward-and-forward-compatible API
 
