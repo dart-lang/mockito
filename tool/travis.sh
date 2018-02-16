@@ -39,7 +39,7 @@ while (( "$#" )); do
     echo -e 'pub run test -p vm'
     pub run test -p vm || EXIT_CODE=$?
     ;;
-  build) echo
+  dartdevc_build) echo
     echo -e '\033[1mTASK: build\033[22m'
     echo -e 'pub run build_runner build --fail-on-severe'
     pub run build_runner build --fail-on-severe || EXIT_CODE=$?
