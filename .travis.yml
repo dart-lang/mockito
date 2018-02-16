@@ -29,6 +29,7 @@ jobs:
     - stage: build
       script: ./tool/travis.sh dartdevc_build
       dart: dev
+      env: NOTES=ddc_tests_allow_failure
     - stage: testing
       script: ./tool/travis.sh dartdevc_test
       dart: dev
@@ -40,9 +41,7 @@ jobs:
 matrix:
   fast_finish: true
 allow_failures:
-  - stage: testing
-    script: ./tool/travis.sh dartdevc_ctest
-    dart: dev
+  - env: NOTES=ddc_tests_allow_failure
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
