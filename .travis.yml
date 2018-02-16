@@ -19,7 +19,6 @@ jobs:
   include:
     - stage: presubmit
       script: ./tool/travis.sh dartfmt
-      env: TASK="dartfmt"
       dart: dev
     - stage: presubmit
       script: ./tool/travis.sh dartanalyzer
