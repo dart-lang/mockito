@@ -31,28 +31,28 @@ while (( "$#" )); do
     ;;
   dartanalyzer) echo
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
-    echo -e 'dartanalyzer --fatal-infos --fatal-warnings .'
-    dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
+    echo -e 'dartanalyzer --fatal-warnings .'
+    dartanalyzer --fatal-warnings . || EXIT_CODE=$?
     ;;
   vm_test) echo
     echo -e '\033[1mTASK: vmn_test\033[22m'
     echo -e 'pub run test -p vm'
-    pub run test || EXIT_CODE=$?
+    pub run test -p vm || EXIT_CODE=$?
     ;;
   build) echo
     echo -e '\033[1mTASK: build\033[22m'
     echo -e 'pub run build_runner build --fail-on-severe'
-    pub run build_runner build -o build --fail-on-severe || EXIT_CODE=$?
+    pub run build_runner build --fail-on-severe || EXIT_CODE=$?
     ;;
   dartdevc_test) echo
     echo -e '\033[1mTASK: dartdevc_test\033[22m'
     echo -e 'pub run build_runner test -- -p chrome'
-    pub run build_runner test || EXIT_CODE=$?
+    pub run build_runner test -- -p chrome || EXIT_CODE=$?
     ;;
   dart2js_test) echo
     echo -e '\033[1mTASK: dart2js_test\033[22m'
     echo -e 'pub run test -p chrome'
-    pub run test --total-shards 4 --shard-index 1 || EXIT_CODE=$?
+    pub run test -p chrome 1 || EXIT_CODE=$?
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
     EXIT_CODE=1
