@@ -22,6 +22,7 @@ jobs:
       dart: dev
     - stage: presubmit
       script: ./tool/travis.sh dartanalyzer
+      dart: dev
     - stage: presubmit
       script: ./tool/travis.sh vm_test
       dart: dev
