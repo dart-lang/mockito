@@ -36,12 +36,6 @@ jobs:
       script: ./tool/travis.sh dart2js_test
       dart: dev
 
-# Known failures
-matrix:
-  fast_finish: true
-allow_failures:
-  - script: ./tool/travis.sh dartdevc_test
-
 # Only building master means that we don't run two builds for each pull request.
 branches:
   only: [master]
