@@ -1,3 +1,8 @@
+## 2.2.4
+
+* `thenReturn` and `thenAnswer` now support generics and infer the correct
+  types from the `when` call.
+
 ## 2.2.3
 
 * Avoid generlized void isses. Fixes Mockito's compliance with Dart SDK
