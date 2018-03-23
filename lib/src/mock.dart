@@ -299,7 +299,6 @@ void clearInteractions(var mock) {
   mock._realCalls.clear();
 }
 
-<<<<<<< HEAD
 class PostExpectation<T> {
   T thenReturn(T expected) {
     return _completeWhen((_) => expected);
