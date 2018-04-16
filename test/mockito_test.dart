@@ -167,20 +167,20 @@ void main() {
     });
 
     test("should mock method with argument matcher", () {
-      when(mock.methodWithNormalArgs(argThat(greaterThan(100))))
+      when(mock.methodWithNormalArgs(typed(argThat(greaterThan(100)))))
           .thenReturn("A lot!");
       expect(mock.methodWithNormalArgs(100), isNull);
       expect(mock.methodWithNormalArgs(101), equals("A lot!"));
     });
 
     test("should mock method with any argument matcher", () {
-      when(mock.methodWithNormalArgs(any)).thenReturn("A lot!");
+      when(mock.methodWithNormalArgs(typed(any))).thenReturn("A lot!");
       expect(mock.methodWithNormalArgs(100), equals("A lot!"));
       expect(mock.methodWithNormalArgs(101), equals("A lot!"));
     });
 
     test("should mock method with any list argument matcher", () {
-      when(mock.methodWithListArgs(any)).thenReturn("A lot!");
+      when(mock.methodWithListArgs(typed(any))).thenReturn("A lot!");
       expect(mock.methodWithListArgs([42]), equals("A lot!"));
       expect(mock.methodWithListArgs([43]), equals("A lot!"));
     });
@@ -201,7 +201,7 @@ void main() {
 
     test("should mock method with mix of argument matchers and real things",
         () {
-      when(mock.methodWithPositionalArgs(argThat(greaterThan(100)), 17))
+      when(mock.methodWithPositionalArgs(typed(argThat(greaterThan(100))), 17))
           .thenReturn("A lot with 17");
       expect(mock.methodWithPositionalArgs(100, 17), isNull);
       expect(mock.methodWithPositionalArgs(101, 18), isNull);
@@ -245,20 +245,21 @@ void main() {
 
     //no need to mock setter, except if we will have spies later...
     test("should mock method with thrown result", () {
-      when(mock.methodWithNormalArgs(any)).thenThrow(new StateError('Boo'));
+      when(mock.methodWithNormalArgs(typed(any)))
+          .thenThrow(new StateError('Boo'));
       expect(() => mock.methodWithNormalArgs(42), throwsStateError);
     });
 
     test("should mock method with calculated result", () {
-      when(mock.methodWithNormalArgs(any)).thenAnswer(
+      when(mock.methodWithNormalArgs(typed(any))).thenAnswer(
           (Invocation inv) => inv.positionalArguments[0].toString());
       expect(mock.methodWithNormalArgs(43), equals("43"));
       expect(mock.methodWithNormalArgs(42), equals("42"));
     });
 
     test("should return mock to make simple oneline mocks", () {
-      RealClass mockWithSetup = when(new MockedClass().methodWithoutArgs())
-          .thenReturn("oneline") as RealClass;
+      RealClass mockWithSetup = new MockedClass();
+      when(mockWithSetup.methodWithoutArgs()).thenReturn("oneline");
       expect(mockWithSetup.methodWithoutArgs(), equals("oneline"));
     });
 
@@ -269,8 +270,10 @@ void main() {
     });
 
     test("should mock method with calculated result", () {
-      when(mock.methodWithNormalArgs(argThat(equals(43)))).thenReturn("43");
-      when(mock.methodWithNormalArgs(argThat(equals(42)))).thenReturn("42");
+      when(mock.methodWithNormalArgs(typed(argThat(equals(43)))))
+          .thenReturn("43");
+      when(mock.methodWithNormalArgs(typed(argThat(equals(42)))))
+          .thenReturn("42");
       expect(mock.methodWithNormalArgs(43), equals("43"));
     });
 
@@ -362,25 +365,26 @@ void main() {
       test("waits for method with normal args", () async {
         mock.methodWithNormalArgs(1);
 
-        await untilCalled(mock.methodWithNormalArgs(any));
+        await untilCalled(mock.methodWithNormalArgs(typed(any)));
 
-        verify(mock.methodWithNormalArgs(any)).called(1);
+        verify(mock.methodWithNormalArgs(typed(any))).called(1);
       });
 
       test("waits for method with list args", () async {
         mock.methodWithListArgs([1]);
 
-        await untilCalled(mock.methodWithListArgs(any));
+        await untilCalled(mock.methodWithListArgs(typed(any)));
 
-        verify(mock.methodWithListArgs(any)).called(1);
+        verify(mock.methodWithListArgs(typed(any))).called(1);
       });
 
       test("waits for method with positional args", () async {
         mock.methodWithPositionalArgs(1, 2);
 
-        await untilCalled(mock.methodWithPositionalArgs(any, any));
+        await untilCalled(
+            mock.methodWithPositionalArgs(typed(any), typed(any)));
 
-        verify(mock.methodWithPositionalArgs(any, any)).called(1);
+        verify(mock.methodWithPositionalArgs(typed(any), typed(any))).called(1);
       });
 
       test("waits for method with named args", () async {
@@ -405,17 +409,20 @@ void main() {
       test("waits for method with obj args", () async {
         mock.methodWithObjArgs(new RealClass());
 
-        await untilCalled(mock.methodWithObjArgs(any));
+        await untilCalled(mock.methodWithObjArgs(typed(any)));
 
-        verify(mock.methodWithObjArgs(any)).called(1);
+        verify(mock.methodWithObjArgs(typed(any))).called(1);
       });
 
       test("waits for function with positional parameters", () async {
         mock.typeParameterizedFn([1, 2], [3, 4], [5, 6], [7, 8]);
 
-        await untilCalled(mock.typeParameterizedFn(any, any, any, any));
+        await untilCalled(mock.typeParameterizedFn(
+            typed(any), typed(any), typed(any), typed(any)));
 
-        verify(mock.typeParameterizedFn(any, any, any, any)).called(1);
+        verify(mock.typeParameterizedFn(
+                typed(any), typed(any), typed(any), typed(any)))
+            .called(1);
       });
 
       test("waits for function with named parameters", () async {
@@ -462,29 +469,30 @@ void main() {
 
       test("waits for method with normal args", () async {
         streamController.add(new CallMethodsEvent());
-        verifyNever(mock.methodWithNormalArgs(any));
+        verifyNever(mock.methodWithNormalArgs(typed(any)));
 
-        await untilCalled(mock.methodWithNormalArgs(any));
+        await untilCalled(mock.methodWithNormalArgs(typed(any)));
 
-        verify(mock.methodWithNormalArgs(any)).called(1);
+        verify(mock.methodWithNormalArgs(typed(any))).called(1);
       });
 
       test("waits for method with list args", () async {
         streamController.add(new CallMethodsEvent());
-        verifyNever(mock.methodWithListArgs(any));
+        verifyNever(mock.methodWithListArgs(typed(any)));
 
-        await untilCalled(mock.methodWithListArgs(any));
+        await untilCalled(mock.methodWithListArgs(typed(any)));
 
-        verify(mock.methodWithListArgs(any)).called(1);
+        verify(mock.methodWithListArgs(typed(any))).called(1);
       });
 
       test("waits for method with positional args", () async {
         streamController.add(new CallMethodsEvent());
-        verifyNever(mock.methodWithPositionalArgs(any, any));
+        verifyNever(mock.methodWithPositionalArgs(typed(any), typed(any)));
 
-        await untilCalled(mock.methodWithPositionalArgs(any, any));
+        await untilCalled(
+            mock.methodWithPositionalArgs(typed(any), typed(any)));
 
-        verify(mock.methodWithPositionalArgs(any, any)).called(1);
+        verify(mock.methodWithPositionalArgs(typed(any), typed(any))).called(1);
       });
 
       test("waits for method with named args", () async {
@@ -511,20 +519,24 @@ void main() {
 
       test("waits for method with obj args", () async {
         streamController.add(new CallMethodsEvent());
-        verifyNever(mock.methodWithObjArgs(any));
+        verifyNever(mock.methodWithObjArgs(typed(any)));
 
-        await untilCalled(mock.methodWithObjArgs(any));
+        await untilCalled(mock.methodWithObjArgs(typed(any)));
 
-        verify(mock.methodWithObjArgs(any)).called(1);
+        verify(mock.methodWithObjArgs(typed(any))).called(1);
       });
 
       test("waits for function with positional parameters", () async {
         streamController.add(new CallMethodsEvent());
-        verifyNever(mock.typeParameterizedFn(any, any, any, any));
+        verifyNever(mock.typeParameterizedFn(
+            typed(any), typed(any), typed(any), typed(any)));
 
-        await untilCalled(mock.typeParameterizedFn(any, any, any, any));
+        await untilCalled(mock.typeParameterizedFn(
+            typed(any), typed(any), typed(any), typed(any)));
 
-        verify(mock.typeParameterizedFn(any, any, any, any)).called(1);
+        verify(mock.typeParameterizedFn(
+                typed(any), typed(any), typed(any), typed(any)))
+            .called(1);
       });
 
       test("waits for function with named parameters", () async {
@@ -632,15 +644,16 @@ void main() {
       expectFail(
           "No matching calls. All calls: MockedClass.methodWithNormalArgs(100)\n"
           "$noMatchingCallsFooter", () {
-        verify(mock.methodWithNormalArgs(argThat(greaterThan(100))));
+        verify(mock.methodWithNormalArgs(typed(argThat(greaterThan(100)))));
       });
-      verify(mock.methodWithNormalArgs(argThat(greaterThanOrEqualTo(100))));
+      verify(
+          mock.methodWithNormalArgs(typed(argThat(greaterThanOrEqualTo(100)))));
     });
 
     test("should mock method with argument capturer", () {
       mock.methodWithNormalArgs(50);
       mock.methodWithNormalArgs(100);
-      expect(verify(mock.methodWithNormalArgs(captureAny)).captured,
+      expect(verify(mock.methodWithNormalArgs(typed(captureAny))).captured,
           equals([50, 100]));
     });
 
@@ -648,12 +661,12 @@ void main() {
       mock.methodWithNormalArgs(50);
       mock.methodWithNormalArgs(100);
       expect(
-          verify(mock.methodWithNormalArgs(captureThat(greaterThan(75))))
+          verify(mock.methodWithNormalArgs(typed(captureThat(greaterThan(75)))))
               .captured
               .single,
           equals(100));
       expect(
-          verify(mock.methodWithNormalArgs(captureThat(lessThan(75))))
+          verify(mock.methodWithNormalArgs(typed(captureThat(lessThan(75)))))
               .captured
               .single,
           equals(50));
@@ -666,15 +679,16 @@ void main() {
           "No matching calls. All calls: MockedClass.methodWithPositionalArgs(100, 17)\n"
           "$noMatchingCallsFooter", () {
         verify(mock.methodWithPositionalArgs(
-            argThat(greaterThanOrEqualTo(100)), 18));
+            typed(argThat(greaterThanOrEqualTo(100))), 18));
       });
       expectFail(
           "No matching calls. All calls: MockedClass.methodWithPositionalArgs(100, 17)\n"
           "$noMatchingCallsFooter", () {
-        verify(mock.methodWithPositionalArgs(argThat(greaterThan(100)), 17));
+        verify(mock.methodWithPositionalArgs(
+            typed(argThat(greaterThan(100))), 17));
       });
       verify(mock.methodWithPositionalArgs(
-          argThat(greaterThanOrEqualTo(100)), 17));
+          typed(argThat(greaterThanOrEqualTo(100))), 17));
     });
 
     test("should mock getter", () {
@@ -865,6 +879,11 @@ void main() {
       verify(mock.methodWithoutArgs());
       verifyNoMoreInteractions(mock);
     });
+
+    test("throws if given a real object", () {
+      expect(
+          () => verifyNoMoreInteractions(new RealClass()), throwsArgumentError);
+    });
   });
 
   group("verifyInOrder()", () {
@@ -917,20 +936,22 @@ void main() {
   group("capture", () {
     test("capture should work as captureOut", () {
       mock.methodWithNormalArgs(42);
-      expect(verify(mock.methodWithNormalArgs(captureAny)).captured.single,
+      expect(
+          verify(mock.methodWithNormalArgs(typed(captureAny))).captured.single,
           equals(42));
     });
 
     test("should captureOut list arguments", () {
       mock.methodWithListArgs([42]);
-      expect(verify(mock.methodWithListArgs(captureAny)).captured.single,
+      expect(verify(mock.methodWithListArgs(typed(captureAny))).captured.single,
           equals([42]));
     });
 
     test("should captureOut multiple arguments", () {
       mock.methodWithPositionalArgs(1, 2);
       expect(
-          verify(mock.methodWithPositionalArgs(captureAny, captureAny))
+          verify(mock.methodWithPositionalArgs(
+                  typed(captureAny), typed(captureAny)))
               .captured,
           equals([1, 2]));
     });
@@ -939,7 +960,8 @@ void main() {
       mock.methodWithPositionalArgs(1);
       mock.methodWithPositionalArgs(2, 3);
       expect(
-          verify(mock.methodWithPositionalArgs(captureAny, captureAny))
+          verify(mock.methodWithPositionalArgs(
+                  typed(captureAny), typed(captureAny)))
               .captured,
           equals([2, 3]));
     });
@@ -947,7 +969,7 @@ void main() {
     test("should captureOut multiple invocations", () {
       mock.methodWithNormalArgs(1);
       mock.methodWithNormalArgs(2);
-      expect(verify(mock.methodWithNormalArgs(captureAny)).captured,
+      expect(verify(mock.methodWithNormalArgs(typed(captureAny))).captured,
           equals([1, 2]));
     });
   });

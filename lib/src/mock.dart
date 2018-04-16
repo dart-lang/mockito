@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Warning: Do not import dart:mirrors in this library, as it's exported via
-// lib/mockito.dart, which is used for Dart AOT projects such as Flutter.
-
 import 'dart:async';
 
 import 'package:meta/meta.dart';
@@ -316,8 +313,8 @@ void clearInteractions(var mock) {
   mock._realCalls.clear();
 }
 
-class PostExpectation {
-  thenReturn(expected) {
+class PostExpectation<T> {
+  void thenReturn(T expected) {
     if (expected is Future) {
       throw new ArgumentError(
           '`thenReturn` should not be used to return a Future. '
@@ -331,22 +328,20 @@ class PostExpectation {
     return _completeWhen((_) => expected);
   }
 
-  thenThrow(throwable) {
+  void thenThrow(throwable) {
     return _completeWhen((_) {
       throw throwable;
     });
   }
 
-  thenAnswer(Answering answer) {
+  void thenAnswer(Answering<T> answer) {
     return _completeWhen(answer);
   }
 
-  _completeWhen(Answering answer) {
+  void _completeWhen(Answering answer) {
     _whenCall._setExpected(answer);
-    var mock = _whenCall.mock;
     _whenCall = null;
     _whenInProgress = false;
-    return mock;
   }
 }
 
@@ -631,7 +626,7 @@ class VerificationResult {
   }
 }
 
-typedef dynamic Answering(Invocation realInvocation);
+typedef T Answering<T>(Invocation realInvocation);
 
 typedef Verification = VerificationResult Function<T>(T matchingInvocations);
 
@@ -732,21 +727,32 @@ _InOrderVerification get verifyInOrder {
   };
 }
 
+void _throwMockArgumentError(method) =>
+    throw new ArgumentError('$method must only be given a Mock object');
+
 void verifyNoMoreInteractions(var mock) {
-  var unverified = mock._realCalls.where((inv) => !inv.verified).toList();
-  if (unverified.isNotEmpty) {
-    fail("No more calls expected, but following found: " + unverified.join());
+  if (mock is Mock) {
+    var unverified = mock._realCalls.where((inv) => !inv.verified).toList();
+    if (unverified.isNotEmpty) {
+      fail("No more calls expected, but following found: " + unverified.join());
+    }
+  } else {
+    _throwMockArgumentError('verifyNoMoreInteractions');
   }
 }
 
 void verifyZeroInteractions(var mock) {
-  if (mock._realCalls.isNotEmpty) {
-    fail("No interaction expected, but following found: " +
-        mock._realCalls.join());
+  if (mock is Mock) {
+    if (mock._realCalls.isNotEmpty) {
+      fail("No interaction expected, but following found: " +
+          mock._realCalls.join());
+    }
+  } else {
+    _throwMockArgumentError('verifyZeroInteractions');
   }
 }
 
-typedef Expectation = PostExpectation Function<T>(T x);
+typedef Expectation = PostExpectation<T> Function<T>(T x);
 
 /// Create a stub method response.
 ///
@@ -772,7 +778,7 @@ Expectation get when {
   _whenInProgress = true;
   return <T>(T _) {
     _whenInProgress = false;
-    return new PostExpectation();
+    return new PostExpectation<T>();
   };
 }
 
