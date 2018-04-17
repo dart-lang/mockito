@@ -45,12 +45,13 @@ Mockito 3 API calls:
 
 | Version |                                                                   |
 | --- | --------------------------------------------------------------------- |
-|     | Using argument matchers as positional arguments                       |
+|     | **Using argument matchers as positional arguments**                   |
 | 2.x | `when(obj.fn(typed(any)))...`                                         |
 | 3.0 | `when(obj.fn(any))...`                                                |
 | 2.x | `when(obj.fn(typed(argThat(equals(7)))))...`                          |
 | 3.0 | `when(obj.fn(argThat(equals(7))))...`                                 |
-|     | Using argument matchers as named arguments                            |
+|     |                                                                       |
+|     | **Using argument matchers as named arguments                          |
 | 2.x | `when(obj.fn(foo: typed(any, named: 'foo')))...`                      |
 | 3.0 | `when(obj.fn(foo: anyNamed('foo')))...`                               |
 | 2.x | `when(obj.fn(foo: typed(argThat(equals(7)), named: 'foo')))...`       |
@@ -60,7 +61,7 @@ Mockito 3 API calls:
 | 2.x | `when(obj.fn(foo: typed(captureAny, named: 'foo')))...`               |
 | 3.0 | `when(obj.fn(foo: captureAnyNamed('foo')))...`                        |
 | 2.x | `when(obj.fn(foo: typed(captureThat(equals(7)), named: 'foo')))...`   |
-| 3.0 | `when(obj.fn(foo: captureThatNamed(equals(7), 'foo')))...`            |
+| 3.0 | `when(obj.fn(foo: captureThat(equals(7), named: 'foo')))...`          |
 
 ## Mockito 3.0.0-beta - a backward-and-forward-compatible API
 
