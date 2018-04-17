@@ -51,7 +51,7 @@ Mockito 3 API calls:
 | 2.x | `when(obj.fn(typed(argThat(equals(7)))))...`                          |
 | 3.0 | `when(obj.fn(argThat(equals(7))))...`                                 |
 |     |                                                                       |
-|     | **Using argument matchers as named arguments                          |
+|     | **Using argument matchers as named arguments**                        |
 | 2.x | `when(obj.fn(foo: typed(any, named: 'foo')))...`                      |
 | 3.0 | `when(obj.fn(foo: anyNamed('foo')))...`                               |
 | 2.x | `when(obj.fn(foo: typed(argThat(equals(7)), named: 'foo')))...`       |
