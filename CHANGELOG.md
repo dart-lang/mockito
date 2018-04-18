@@ -1,4 +1,4 @@
-## 3.0.0-beta+100
+## 3.0.0-beta
 
 * This release is the first 3.0.0 release featuring the new Mockito 3 API. The
   README has been updated, and an [upgrading-to-mockito-3] doc has been added
