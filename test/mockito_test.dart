@@ -710,7 +710,7 @@ void main() {
       var badHelper = () => throw 'boo';
       try {
         verify(mock.methodWithNamedArgs(42, y: badHelper()));
-        fail("veriy call was expected to throw!");
+        fail("verify call was expected to throw!");
       } catch (_) {}
       // At this point, verification was interrupted, so
       // `_verificationInProgress` is still `true`. Calling mock methods below
@@ -719,13 +719,13 @@ void main() {
       mock.methodWithNamedArgs(42, y: 17);
       try {
         verify(mock.methodWithNamedArgs(42, y: 17));
-        fail("veriy call was expected to throw!");
+        fail("verify call was expected to throw!");
       } catch (e) {
         expect(e, new isInstanceOf<StateError>());
         expect(
             e.message,
             contains(
-                'Verification appears to be in progress. 2 verify calls have been stored.'));
+                "Verification appears to be in progress. 2 verify calls have been stored."));
       }
     });
   });
