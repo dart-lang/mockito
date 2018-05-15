@@ -216,11 +216,11 @@ void main() {
     test(
         'should fail when no matching call is found, '
         'and unmatched calls have only named args', () {
-      mock.methodWithNamedArgsOnly(y: 1);
+      mock.methodWithOnlyNamedArgs(y: 1);
       expectFail(
-          'No matching calls. All calls: MockedClass.methodWithNamedArgsOnly({y: 1})\n'
+          'No matching calls. All calls: MockedClass.methodWithOnlyNamedArgs({y: 1})\n'
           '$noMatchingCallsFooter', () {
-        verify(mock.methodWithNamedArgsOnly());
+        verify(mock.methodWithOnlyNamedArgs());
       });
     });
 
