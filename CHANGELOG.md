@@ -21,6 +21,8 @@
   when(obj.fn(foo: argThat(isNull, named: 'foo')))...
   ```
 
+## 3.0.0-alpha+5
+
 * Fix compatibility with new [noSuchMethod Forwarding] feature of Dart 2. This
   is thankfully a mostly backwards-compatible change. This means that this
   version of Mockito should continue to work:
