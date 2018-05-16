@@ -133,6 +133,18 @@ class Mock {
 
   @override
   String toString() => _givenName != null ? _givenName : runtimeType.toString();
+
+  String _realCallsToString() {
+    var stringRepresentations = _realCalls.map((call) => call.toString());
+    if (stringRepresentations.any((s) => s.contains('\n'))) {
+      // As each call contains newlines, put each on its own line, for better
+      // readability.
+      return stringRepresentations.join(',\n');
+    } else {
+      // A compact String should be perfect.
+      return stringRepresentations.join(', ');
+    }
+  }
 }
 
 typedef CallPair _ReturnsCannedResponse();
@@ -203,20 +215,10 @@ class _InvocationForMatchedArguments extends Invocation {
     invocation.namedArguments.forEach((name, arg) {
       if (arg == null) {
         if (!_storedNamedArgSymbols.contains(name)) {
-          // Incorrect usage of an ArgMatcher, something like:
-          // `when(obj.fn(a: any))`.
-
-          // Clear things out for the next call.
-          _storedArgs.clear();
-          _storedNamedArgs.clear();
-          throw new ArgumentError(
-              'An ArgumentMatcher (or a null value) was passed in as a named '
-              'argument named "$name", but was not passed a value for `named`. '
-              'Each ArgumentMatcher that is passed as a named argument needs '
-              'to specify the `named` argument, and each null value must be '
-              'wrapped in an ArgMatcher. For example: '
-              '`when(obj.fn(x: anyNamed("x")))` or '
-              '`when(obj.fn(x: argThat(isNull, named: "x")))`.');
+          // Either this is a parameter with default value `null`, or a `null`
+          // argument was passed, or an unnamed ArgMatcher was used. Just use
+          // `null`.
+          namedArguments[name] = null;
         }
       } else {
         // Add each real named argument (not wrapped in an ArgMatcher).
@@ -259,13 +261,19 @@ class _InvocationForMatchedArguments extends Invocation {
     var positionalArguments = <dynamic>[];
     var nullPositionalArguments =
         invocation.positionalArguments.where((arg) => arg == null);
-    if (_storedArgs.length != nullPositionalArguments.length) {
-      // Clear things out for the next call.
+    if (_storedArgs.length > nullPositionalArguments.length) {
+      // More _positional_ ArgMatchers were stored than were actually passed as
+      // positional arguments. The only way this call was parsed and resolved is
+      // if an ArgMatcher was passed as a named argument, but without a name,
+      // and thus stored in [_storedArgs], something like
+      // `when(obj.fn(a: any))`.
       _storedArgs.clear();
       _storedNamedArgs.clear();
       throw new ArgumentError(
-          'null arguments are not allowed alongside ArgMatchers; use '
-          '"argThat(isNull)"');
+          'An argument matcher (like `any`) was used as a named argument, but '
+          'did not use a Mockito "named" API. Each argument matcher that is '
+          'used as a named argument needs to specify the name of the argument '
+          'it is being used in. For example: `when(obj.fn(x: anyNamed("x")))`.');
     }
     int storedIndex = 0;
     int positionalIndex = 0;
@@ -456,31 +464,50 @@ class RealCall {
 
   @override
   String toString() {
+    var argString = '';
     var args = invocation.positionalArguments
-        .map((v) => v == null ? "null" : v.toString())
-        .join(", ");
+        .map((v) => v == null ? "null" : v.toString());
+    if (args.any((arg) => arg.contains('\n'))) {
+      // As one or more arg contains newlines, put each on its own line, and
+      // indent each, for better readability.
+      argString += '\n' +
+          args
+              .map((arg) => arg.splitMapJoin('\n', onNonMatch: (m) => '    $m'))
+              .join(',\n');
+    } else {
+      // A compact String should be perfect.
+      argString += args.join(', ');
+    }
     if (invocation.namedArguments.isNotEmpty) {
-      var namedArgs = invocation.namedArguments.keys
-          .map((key) =>
-              "${_symbolToString(key)}: ${invocation.namedArguments[key]}")
-          .join(", ");
-      args += ", {$namedArgs}";
+      if (argString.isNotEmpty) argString += ', ';
+      var namedArgs = invocation.namedArguments.keys.map((key) =>
+          '${_symbolToString(key)}: ${invocation.namedArguments[key]}');
+      if (namedArgs.any((arg) => arg.contains('\n'))) {
+        // As one or more arg contains newlines, put each on its own line, and
+        // indent each, for better readability.
+        namedArgs = namedArgs
+            .map((arg) => arg.splitMapJoin('\n', onNonMatch: (m) => '    $m'));
+        argString += '{\n${namedArgs.join(',\n')}}';
+      } else {
+        // A compact String should be perfect.
+        argString += '{${namedArgs.join(', ')}}';
+      }
     }
 
     var method = _symbolToString(invocation.memberName);
     if (invocation.isMethod) {
-      method = "$method($args)";
+      method = '$method($argString)';
     } else if (invocation.isGetter) {
-      method = "$method";
+      method = '$method';
     } else if (invocation.isSetter) {
-      method = "$method=$args";
+      method = '$method=$argString';
     } else {
       throw new StateError(
           'Invocation should be getter, setter or a method call.');
     }
 
-    var verifiedText = verified ? "[VERIFIED] " : "";
-    return "$verifiedText$mock.$method";
+    var verifiedText = verified ? '[VERIFIED] ' : '';
+    return '$verifiedText$mock.$method';
   }
 
   // This used to use MirrorSystem, which cleans up the Symbol() wrapper.
@@ -550,7 +577,7 @@ class _VerifyCall {
       if (mock._realCalls.isEmpty) {
         message = "No matching calls (actually, no calls at all).";
       } else {
-        var otherCalls = mock._realCalls.join(", ");
+        var otherCalls = mock._realCallsToString();
         message = "No matching calls. All calls: $otherCalls";
       }
       fail("$message\n"
@@ -558,13 +585,16 @@ class _VerifyCall {
           "`verifyNever(...);`.)");
     }
     if (never && matchingInvocations.isNotEmpty) {
-      var calls = mock._realCalls.join(", ");
+      var calls = mock._realCallsToString();
       fail("Unexpected calls. All calls: $calls");
     }
     matchingInvocations.forEach((inv) {
       inv.verified = true;
     });
   }
+
+  String toString() =>
+      'VerifyCall<mock: $mock, memberName: ${verifyInvocation.memberName}>';
 }
 
 class ArgMatcher {
@@ -600,6 +630,14 @@ Null captureThat(Matcher matcher, {String named}) =>
 
 @Deprecated('ArgMatchers no longer need to be wrapped in Mockito 3.0')
 Null typed<T>(ArgMatcher matcher, {String named}) => null;
+
+@Deprecated('Replace with `argThat`')
+Null typedArgThat(Matcher matcher, {String named}) =>
+    argThat(matcher, named: named);
+
+@Deprecated('Replace with `captureThat`')
+Null typedCaptureThat(Matcher matcher, {String named}) =>
+    captureThat(matcher, named: named);
 
 Null _registerMatcher(Matcher matcher, bool capture, {String named}) {
   var argMatcher = new ArgMatcher(matcher, capture);
@@ -673,7 +711,16 @@ Verification get verify => _makeVerify(false);
 
 Verification _makeVerify(bool never) {
   if (_verifyCalls.isNotEmpty) {
-    throw new StateError(_verifyCalls.join());
+    var message = 'Verification appears to be in progress.';
+    if (_verifyCalls.length == 1) {
+      message =
+          '$message One verify call has been stored: ${_verifyCalls.single}';
+    } else {
+      message =
+          '$message ${_verifyCalls.length} verify calls have been stored. '
+          '[${_verifyCalls.first}, ..., ${_verifyCalls.last}]';
+    }
+    throw new StateError(message);
   }
   _verificationInProgress = true;
   return <T>(T mock) {
