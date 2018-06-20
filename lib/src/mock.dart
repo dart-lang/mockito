@@ -39,7 +39,8 @@ void setDefaultResponse(Mock mock, CallPair<dynamic> defaultResponse()) {
 ///
 /// The default behavior when not using this is to always return `null`.
 void throwOnMissingStub(Mock mock) {
-  mock._defaultResponse = () => new CallPair<dynamic>.allInvocations(mock._noSuchMethod);
+  mock._defaultResponse =
+      () => new CallPair<dynamic>.allInvocations(mock._noSuchMethod);
 }
 
 /// Extend or mixin this class to mark the implementation as a [Mock].
