@@ -100,21 +100,30 @@ void main() {
 
     test('should capture invocations with named arguments', () {
       mock.methodWithTwoNamedArgs(1, y: 42, z: 43);
-      expect(verify(mock.methodWithTwoNamedArgs(any, y: captureAnyNamed('y'), z: captureAnyNamed('z'))).captured,
+      expect(
+          verify(mock.methodWithTwoNamedArgs(any,
+                  y: captureAnyNamed('y'), z: captureAnyNamed('z')))
+              .captured,
           equals([42, 43]));
     });
 
     test('should capture invocations with named arguments', () {
       mock.methodWithTwoNamedArgs(1, y: 42, z: 43);
       mock.methodWithTwoNamedArgs(1, y: 44, z: 45);
-      expect(verify(mock.methodWithTwoNamedArgs(any, y: captureAnyNamed('y'), z: captureAnyNamed('z'))).captured,
+      expect(
+          verify(mock.methodWithTwoNamedArgs(any,
+                  y: captureAnyNamed('y'), z: captureAnyNamed('z')))
+              .captured,
           equals([42, 43, 44, 45]));
     });
 
     test('should capture invocations with named arguments', () {
       mock.methodWithTwoNamedArgs(1, z: 42, y: 43);
       mock.methodWithTwoNamedArgs(1, y: 44, z: 45);
-      expect(verify(mock.methodWithTwoNamedArgs(any, y: captureAnyNamed('y'), z: captureAnyNamed('z'))).captured,
+      expect(
+          verify(mock.methodWithTwoNamedArgs(any,
+                  y: captureAnyNamed('y'), z: captureAnyNamed('z')))
+              .captured,
           equals([43, 42, 44, 45]));
     });
   });
