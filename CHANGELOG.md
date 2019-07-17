@@ -1,4 +1,4 @@
-## 4.2.0
+## 4.1.1
 
 * Mark the unexported and accidentally public `setDefaultResponse` as
   deprecated.
