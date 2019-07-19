@@ -6,11 +6,6 @@ sudo: required
 addons:
   chrome: stable
 
-# Necessary for Chrome and Firefox to run
-# See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-services
-services:
-  - xvfb
-
 dart:
   - dev
 
