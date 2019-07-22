@@ -659,9 +659,9 @@ class _VerifyCall {
 // An argument matcher that acts like an argument during stubbing or
 // verification, and stores "matching" information.
 //
-// Users do not need to construct this manually; users can instead use the
-// built-in values, [any], [anyNamed], [captureAny], [captureAnyNamed], or the
-// functions [argThat] and [captureThat].
+/// Users do not need to construct this manually; users can instead use the
+/// built-in values, [any], [anyNamed], [captureAny], [captureAnyNamed], or the
+/// functions [argThat] and [captureThat].
 class ArgMatcher {
   final Matcher matcher;
   final bool _capture;
