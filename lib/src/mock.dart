@@ -733,6 +733,8 @@ Null _registerMatcher(Matcher matcher, bool capture, {String named}) {
 /// * verifying call count, via [called],
 /// * collecting captured arguments, via [captured].
 class VerificationResult {
+  List<dynamic> _captured;
+
   /// List of all arguments captured in real calls.
   ///
   /// This list will include any captured default arguments and has no
@@ -765,13 +767,16 @@ class VerificationResult {
   ///
   /// Named arguments are listed in the order they are captured in, not the
   /// order in which they were passed.
-  // TODO(srawlins): make this final, in a major release, as a breaking change.
-  List<dynamic> captured = [];
+  List<dynamic> get captured => _captured;
+
+  @Deprecated(
+      'captured should be considered final - assigning this field may be '
+      'removed as early as Mockito 5.0.0')
+  set captured(List<dynamic> captured) => _captured = captured;
 
   /// The number of calls matched in this verification.
   int callCount;
 
-  // Whether the test API mismatch has been checked.
   bool _testApiMismatchHasBeenChecked = false;
 
   @Deprecated(
@@ -779,8 +784,8 @@ class VerificationResult {
       'be deleted as early as Mockito 5.0.0')
   VerificationResult(int callCount) : this._(callCount);
 
-  VerificationResult._(this.callCount) {
-    captured = [..._capturedArgs];
+  VerificationResult._(this.callCount)
+      : _captured = List<dynamic>.from(_capturedArgs, growable: false) {
     _capturedArgs.clear();
   }
 
