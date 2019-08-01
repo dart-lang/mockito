@@ -157,10 +157,10 @@ void main() {
   });
 
   test("Waiting for an interaction", () async {
-
     Future<void> chewHelper(Cat cat) {
       return cat.chew();
     }
+
     // Waiting for a call.
     chewHelper(cat);
     await untilCalled(cat.chew()); // This completes when cat.chew() is called.
