@@ -917,6 +917,8 @@ Verification _makeVerify(bool never) {
   };
 }
 
+/// Verify that a list of methods on a mock object have been called with the
+/// given arguments.
 _InOrderVerification get verifyInOrder {
   if (_verifyCalls.isNotEmpty) {
     throw StateError(_verifyCalls.join());
