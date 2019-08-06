@@ -918,7 +918,14 @@ Verification _makeVerify(bool never) {
 }
 
 /// Verify that a list of methods on a mock object have been called with the
-/// given arguments.
+/// given arguments. For example:
+///
+/// ```dart
+/// verifyInOrder([cat.eatFood("Milk"), cat.sound(), cat.eatFood(any)]);
+/// ```
+///
+/// This verifies that `eatFood` was called with `"Milk"`, sound` was called
+/// with no arguments, and `eatFood` was then called with some argument.
 _InOrderVerification get verifyInOrder {
   if (_verifyCalls.isNotEmpty) {
     throw StateError(_verifyCalls.join());
