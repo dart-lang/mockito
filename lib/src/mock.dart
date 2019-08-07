@@ -930,7 +930,7 @@ Verification _makeVerify(bool never) {
 /// Note: [verifyInOrder] only verifies that each call was made in the order
 /// given, but not that those were the only calls. In the example above, if
 /// other calls were made to `eatFood` or `sound` between the three given
-/// calls, or before or after them, the verification will still pass.
+/// calls, or before or after them, the verification will still succeed.
 _InOrderVerification get verifyInOrder {
   if (_verifyCalls.isNotEmpty) {
     throw StateError(_verifyCalls.join());
