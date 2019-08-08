@@ -353,7 +353,7 @@ in the tests where they are used. For responses controlled outside of the test
 use `@override` methods for either the entire interface, or with `extends Fake`
 to skip some parts of the interface.
 
-Similarly, a class which `extends Mock` should _never_ have an `@override`
+Similarly, a class which `extends Mock` should _never_ have any `@override`
 methods. These can't be stubbed by tests and can't be tracked and verified by
 Mockito. A mix of test defined stubbed responses and mock defined overrides will
 lead to confusion. It is OK to define _static_ utilities on a class which
