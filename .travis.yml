@@ -23,18 +23,25 @@ stages:
 jobs:
   include:
     - stage: presubmit
+      name: dartfmt
       script: ./tool/travis.sh dartfmt
     - stage: presubmit
+      name: analyzer
       script: ./tool/travis.sh dartanalyzer
     - stage: presubmit
+      name: vm test
       script: ./tool/travis.sh vm_test
     - stage: build
+      name: DDC build
       script: ./tool/travis.sh dartdevc_build
     - stage: testing
+      name: DDC test
       script: ./tool/travis.sh dartdevc_test
     - stage: testing
+      name: dart2js test
       script: ./tool/travis.sh dart2js_test
     - stage: testing
+      name: code coverage
       script: ./tool/travis.sh coverage
 
 # Only building master means that we don't run two builds for each pull request.
