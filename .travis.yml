@@ -8,6 +8,8 @@ addons:
 
 dart:
   - dev
+  - 2.8.0-dev.6.0
+  - 2.7.1
 
 # Build stages: https://docs.travis-ci.com/user/build-stages/.
 stages:
