@@ -1,15 +1,9 @@
 language: dart
 
-# Gives more resources on Travis (8GB Ram, 2 CPUs).
-# Do not remove without verifying w/ Travis.
-sudo: required
-addons:
-  chrome: stable
-
 dart:
-  - dev
-  - 2.8.0-dev.6.0
-  - 2.7.1
+  #- dev
+  #- 2.8.0-dev.6.0
+  - stable
 
 # Build stages: https://docs.travis-ci.com/user/build-stages/.
 stages:
