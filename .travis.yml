@@ -12,56 +12,56 @@ stages:
 jobs:
     include:
     - stage: presubmit
-      name: analyzer
+      name: "2.3.0 analyzer"
       script: ./tool/travis.sh dartanalyzer
       dart: 2.3.0
     - stage: presubmit
-      name: vm test
+      name: "2.3.0 vm test"
       script: ./tool/travis.sh vm_test
       dart: 2.3.0
     - stage: build
-      name: DDC build
+      name: "2.3.0 DDC build"
       script: ./tool/travis.sh dartdevc_build
       dart: 2.3.0
     - stage: testing
-      name: DDC test
+      name: "2.3.0 DDC test"
       script: ./tool/travis.sh dartdevc_test
       dart: 2.3.0
     - stage: testing
-      name: dart2js test
+      name: "2.3.0 dart2js test"
       script: ./tool/travis.sh dart2js_test
       dart: 2.3.0
     - stage: testing
-      name: code coverage
+      name: "2.3.0 code coverage"
       script: ./tool/travis.sh coverage
       dart: 2.3.0
 
     - stage: presubmit
-      name: dartfmt
+      name: "dev dartfmt"
       script: ./tool/travis.sh dartfmt
       dart: dev
     - stage: presubmit
-      name: analyzer
+      name: "dev analyzer"
       script: ./tool/travis.sh dartanalyzer
       dart: dev
     - stage: presubmit
-      name: vm test
+      name: "dev vm test"
       script: ./tool/travis.sh vm_test
       dart: dev
     - stage: build
-      name: DDC build
+      name: "dev DDC build"
       script: ./tool/travis.sh dartdevc_build
       dart: dev
     - stage: testing
-      name: DDC test
+      name: "dev DDC test"
       script: ./tool/travis.sh dartdevc_test
       dart: dev
     - stage: testing
-      name: dart2js test
+      name: "dev dart2js test"
       script: ./tool/travis.sh dart2js_test
       dart: dev
     - stage: testing
-      name: code coverage
+      name: "dev code coverage"
       script: ./tool/travis.sh coverage
       dart: dev
 
