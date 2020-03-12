@@ -1,8 +1,5 @@
 {
  "language": "dart",
- "dart": [
-  "stable"
- ],
  "stages": [
   "presubmit",
   "build",
@@ -13,37 +10,128 @@
    {
     "stage": "presubmit",
     "name": "dartfmt",
-    "script": "./tool/travis.sh dartfmt"
+    "script": "./tool/travis.sh dartfmt",
+    "dart": "dev"
+   },
+   {
+    "stage": "presubmit",
+    "name": "dartfmt",
+    "script": "./tool/travis.sh dartfmt",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "presubmit",
+    "name": "dartfmt",
+    "script": "./tool/travis.sh dartfmt",
+    "dart": "stable"
    },
    {
     "stage": "presubmit",
     "name": "analyzer",
-    "script": "./tool/travis.sh dartanalyzer"
+    "script": "./tool/travis.sh dartanalyzer",
+    "dart": "dev"
+   },
+   {
+    "stage": "presubmit",
+    "name": "analyzer",
+    "script": "./tool/travis.sh dartanalyzer",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "presubmit",
+    "name": "analyzer",
+    "script": "./tool/travis.sh dartanalyzer",
+    "dart": "stable"
    },
    {
     "stage": "presubmit",
     "name": "vm test",
-    "script": "./tool/travis.sh vm_test"
+    "script": "./tool/travis.sh vm_test",
+    "dart": "dev"
+   },
+   {
+    "stage": "presubmit",
+    "name": "vm test",
+    "script": "./tool/travis.sh vm_test",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "presubmit",
+    "name": "vm test",
+    "script": "./tool/travis.sh vm_test",
+    "dart": "stable"
    },
    {
     "stage": "build",
     "name": "DDC build",
-    "script": "./tool/travis.sh dartdevc_build"
+    "script": "./tool/travis.sh dartdevc_build",
+    "dart": "dev"
+   },
+   {
+    "stage": "build",
+    "name": "DDC build",
+    "script": "./tool/travis.sh dartdevc_build",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "build",
+    "name": "DDC build",
+    "script": "./tool/travis.sh dartdevc_build",
+    "dart": "stable"
    },
    {
     "stage": "testing",
     "name": "DDC test",
-    "script": "./tool/travis.sh dartdevc_test"
+    "script": "./tool/travis.sh dartdevc_test",
+    "dart": "dev"
+   },
+   {
+    "stage": "testing",
+    "name": "DDC test",
+    "script": "./tool/travis.sh dartdevc_test",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "testing",
+    "name": "DDC test",
+    "script": "./tool/travis.sh dartdevc_test",
+    "dart": "stable"
    },
    {
     "stage": "testing",
     "name": "dart2js test",
-    "script": "./tool/travis.sh dart2js_test"
+    "script": "./tool/travis.sh dart2js_test",
+    "dart": "dev"
+   },
+   {
+    "stage": "testing",
+    "name": "dart2js test",
+    "script": "./tool/travis.sh dart2js_test",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "testing",
+    "name": "dart2js test",
+    "script": "./tool/travis.sh dart2js_test",
+    "dart": "stable"
    },
    {
     "stage": "testing",
     "name": "code coverage",
-    "script": "./tool/travis.sh coverage"
+    "script": "./tool/travis.sh coverage",
+    "dart": "dev"
+   },
+   {
+    "stage": "testing",
+    "name": "code coverage",
+    "script": "./tool/travis.sh coverage",
+    "dart": "2.8.0-dev.6.0"
+   },
+   {
+    "stage": "testing",
+    "name": "code coverage",
+    "script": "./tool/travis.sh coverage",
+    "dart": "stable"
    }
   ]
  },
