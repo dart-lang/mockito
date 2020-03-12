@@ -24,10 +24,12 @@ Object _transform(Object input, List<String> path) {
     if (p.joinAll(path) == 'jobs/include') {
       return list.cast<Map<String, dynamic>>().expand((element) {
         return _sdks.map((e) {
-          return {
+          final newValue = {
             ...element,
             'dart': e,
           };
+          newValue['name'] = '${newValue['name']} - $e';
+          return newValue;
         }).toList();
       }).toList();
     } else {
