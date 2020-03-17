@@ -1,6 +1,6 @@
 Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito).
 
-[![Pub](https://img.shields.io/pub/v/mockito.svg)](https://pub.dartlang.org/packages/mockito)
+[![Pub](https://img.shields.io/pub/v/mockito.svg)](https://pub.dev/packages/mockito)
 [![Build Status](https://travis-ci.org/dart-lang/mockito.svg?branch=master)](https://travis-ci.org/dart-lang/mockito)
 
 ## Let's create mocks
@@ -296,7 +296,7 @@ void main() {
 ```
 
 [Fake]: https://pub.dev/documentation/mockito/latest/mockito/Fake-class.html
-[UnimplementedError]: https://api.dartlang.org/stable/dart-core/UnimplementedError-class.html
+[UnimplementedError]: https://api.dart.dev/stable/dart-core/UnimplementedError-class.html
 
 ## Resetting mocks
 
