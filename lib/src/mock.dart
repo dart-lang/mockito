@@ -846,7 +846,7 @@ class VerificationResult {
   void _checkTestApiMismatch() {
     try {
       Invoker.current;
-    } on CastError catch (e) {
+    } on TypeError catch (e) {
       if (!e
           .toString()
           .contains("type 'Invoker' is not a subtype of type 'Invoker'")) {

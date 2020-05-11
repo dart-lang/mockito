@@ -1,4 +1,6 @@
-Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito).
+# Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito).
+
+**NOTE:** This is not an official Google product
 
 [![Pub](https://img.shields.io/pub/v/mockito.svg)](https://pub.dartlang.org/packages/mockito)
 [![Build Status](https://travis-ci.org/dart-lang/mockito.svg?branch=master)](https://travis-ci.org/dart-lang/mockito)
@@ -72,10 +74,10 @@ expect(cat.sound(), "Meow");
 
 By default, for all methods that return a value, `mock` returns `null`.
 Stubbing can be overridden: for example common stubbing can go to fixture setup
-but the test methods can override it.  Please note that overridding stubbing is
-a potential code smell that points out too much stubbing.  Once stubbed, the
+but the test methods can override it. Please note that overridding stubbing is
+a potential code smell that points out too much stubbing. Once stubbed, the
 method will always return stubbed value regardless of how many times it is
-called.  Last stubbing is more important, when you stubbed the same method with
+called. Last stubbing is more important, when you stubbed the same method with
 the same arguments many times. In other words: the order of stubbing matters,
 but it is meaningful rarely, e.g. when stubbing exactly the same method calls
 or sometimes when argument matchers are used, etc.
@@ -86,9 +88,9 @@ or sometimes when argument matchers are used, etc.
 `ArgumentError`.** This is because it can lead to unexpected behaviors. For
 example:
 
-* If the method is stubbed in a different zone than the zone that consumes the
+- If the method is stubbed in a different zone than the zone that consumes the
   `Future`, unexpected behavior could occur.
-* If the method is stubbed to return a failed `Future` or `Stream` and it
+- If the method is stubbed to return a failed `Future` or `Stream` and it
   doesn't get consumed in the same run loop, it might get consumed by the
   global exception handler instead of an exception handler the consumer applies.
 
@@ -118,7 +120,6 @@ pre-defined instance.
 final future = Future.value('Stub');
 when(mock.methodThatReturnsAFuture()).thenAnswer((_) => future);
 ```
-
 
 ## Argument matchers
 
@@ -295,8 +296,8 @@ void main() {
 }
 ```
 
-[Fake]: https://pub.dev/documentation/mockito/latest/mockito/Fake-class.html
-[UnimplementedError]: https://api.dartlang.org/stable/dart-core/UnimplementedError-class.html
+[fake]: https://pub.dev/documentation/mockito/latest/mockito/Fake-class.html
+[unimplementederror]: https://api.dartlang.org/stable/dart-core/UnimplementedError-class.html
 
 ## Resetting mocks
 
@@ -353,5 +354,3 @@ lead to confusion. It is OK to define _static_ utilities on a class which
 
 Read more information about this package in the
 [FAQ](https://github.com/dart-lang/mockito/blob/master/FAQ.md).
-
-**NOTE:** This is not an official Google product
