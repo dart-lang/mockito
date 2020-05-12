@@ -1,4 +1,4 @@
-# Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito).
+# Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito)
 
 **NOTE:** This is not an official Google product
 
@@ -88,15 +88,15 @@ or sometimes when argument matchers are used, etc.
 `ArgumentError`.** This is because it can lead to unexpected behaviors. For
 example:
 
-- If the method is stubbed in a different zone than the zone that consumes the
+* If the method is stubbed in a different zone than the zone that consumes the
   `Future`, unexpected behavior could occur.
-- If the method is stubbed to return a failed `Future` or `Stream` and it
+* If the method is stubbed to return a failed `Future` or `Stream` and it
   doesn't get consumed in the same run loop, it might get consumed by the
   global exception handler instead of an exception handler the consumer applies.
 
 Instead, use `thenAnswer` to stub methods that return a `Future` or `Stream`.
 
-```
+```dart
 // BAD
 when(mock.methodThatReturnsAFuture())
     .thenReturn(Future.value('Stub'));
@@ -114,7 +114,7 @@ when(mock.methodThatReturnsAStream())
 If, for some reason, you desire the behavior of `thenReturn`, you can return a
 pre-defined instance.
 
-```
+```dart
 // Use the above method unless you're sure you want to create the Future ahead
 // of time.
 final future = Future.value('Stub');
@@ -296,8 +296,8 @@ void main() {
 }
 ```
 
-[fake]: https://pub.dev/documentation/mockito/latest/mockito/Fake-class.html
-[unimplementederror]: https://api.dartlang.org/stable/dart-core/UnimplementedError-class.html
+[Fake]: https://pub.dev/documentation/mockito/latest/mockito/Fake-class.html
+[UnimplementedError]: https://api.dartlang.org/stable/dart-core/UnimplementedError-class.html
 
 ## Resetting mocks
 
