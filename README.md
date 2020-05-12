@@ -1,7 +1,5 @@
 # Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito)
 
-**NOTE:** This is not an official Google product
-
 [![Pub](https://img.shields.io/pub/v/mockito.svg)](https://pub.dartlang.org/packages/mockito)
 [![Build Status](https://travis-ci.org/dart-lang/mockito.svg?branch=master)](https://travis-ci.org/dart-lang/mockito)
 
@@ -354,3 +352,5 @@ lead to confusion. It is OK to define _static_ utilities on a class which
 
 Read more information about this package in the
 [FAQ](https://github.com/dart-lang/mockito/blob/master/FAQ.md).
+
+**NOTE:** This is not an official Google product
