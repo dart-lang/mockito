@@ -362,10 +362,12 @@ void main() {
       });
 
       test('one fails', () {
+        // Add one verified method that should not appear in message.
+        mock.methodWithNormalArgs(1);
+        verify(mock.methodWithNormalArgs(1)).called(1);
+
         mock.methodWithoutArgs();
-        expectFail(
-            'Unexpected calls. All calls: _MockedClass.methodWithoutArgs()',
-            () {
+        expectFail('Unexpected calls: _MockedClass.methodWithoutArgs()', () {
           verifyNever(mock.methodWithoutArgs());
         });
       });

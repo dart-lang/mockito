@@ -153,8 +153,9 @@ class Mock {
   @override
   String toString() => _givenName ?? runtimeType.toString();
 
-  String _realCallsToString() {
-    var stringRepresentations = _realCalls.map((call) => call.toString());
+  String _realCallsToString([Iterable<RealCall> realCalls]) {
+    var stringRepresentations =
+        (realCalls ?? _realCalls).map((call) => call.toString());
     if (stringRepresentations.any((s) => s.contains('\n'))) {
       // As each call contains newlines, put each on its own line, for better
       // readability.
@@ -164,6 +165,9 @@ class Mock {
       return stringRepresentations.join(', ');
     }
   }
+
+  String _unverifiedCallsToString() =>
+      _realCallsToString(_realCalls.where((call) => !call.verified));
 }
 
 /// Extend or mixin this class to mark the implementation as a [Fake].
@@ -402,6 +406,10 @@ void clearInteractions(var mock) {
 }
 
 class PostExpectation<T> {
+  /// Store a canned response for this method stub.
+  ///
+  /// Note: [expected] cannot be a Future or Stream, due to Zone considerations.
+  /// To return a Future or Stream from a method stub, use [thenAnswer].
   void thenReturn(T expected) {
     if (expected is Future) {
       throw ArgumentError('`thenReturn` should not be used to return a Future. '
@@ -414,12 +422,16 @@ class PostExpectation<T> {
     return _completeWhen((_) => expected);
   }
 
+  /// Store an exception to throw when this method stub is called.
   void thenThrow(throwable) {
     return _completeWhen((_) {
       throw throwable;
     });
   }
 
+  /// Store a function which is called when this method stub is called.
+  ///
+  /// The function will be called, and the return value will be returned.
   void thenAnswer(Answering<T> answer) {
     return _completeWhen(answer);
   }
@@ -665,8 +677,8 @@ class _VerifyCall {
           '`verifyNever(...);`.)');
     }
     if (never && matchingInvocations.isNotEmpty) {
-      var calls = mock._realCallsToString();
-      fail('Unexpected calls. All calls: $calls');
+      var calls = mock._unverifiedCallsToString();
+      fail('Unexpected calls: $calls');
     }
     matchingInvocations.forEach((inv) {
       inv.verified = true;
@@ -924,6 +936,10 @@ Verification get verifyNever => _makeVerify(true);
 /// verify(cat.eatFood("fish")).called(2);
 /// verify(cat.eatFood("fish")).called(greaterThan(3));
 /// ```
+///
+/// Note: When mockito verifies a method call, said call is then excluded from
+/// further verifications. A single method call cannot be verified from multiple
+/// calls to `verify`, or `verifyInOrder`. See more details in the FAQ.
 ///
 /// Note: because of an unintended limitation, `verify(...).called(0);` will
 /// not work as expected. Please use `verifyNever(...);` instead.
