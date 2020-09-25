@@ -293,8 +293,8 @@ void main() {
       expect(() => mock.methodWithoutArgs(), returnsNormally);
     });
     
-    test('should throw the exception when a mock was called without a matching
-        stub and an exception is set.', () {
+    test('should throw the exception when a mock was called without a matching'
+        'stub and an exception builder is set.', () {
       throwOnMissingStub(mock, exceptionBuilder: (_) {
         throw Exception('test message');
       });
