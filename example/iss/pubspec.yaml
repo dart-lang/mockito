@@ -1,0 +1,15 @@
+name: iss
+description: This library accesses the International Space Station's APIs (using [package:http](https://pub.dev/packages/http)) to fetch the space station's current location.
+
+publish_to: none
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  http:
+
+dev_dependencies:
+  mockito:
+    path: ../../
+  test: ^1.5.1
