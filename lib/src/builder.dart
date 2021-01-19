@@ -1150,7 +1150,7 @@ class _MockLibraryInfo {
 
     final invocation = refer('Invocation').property('setter').call([
       refer('#${setter.displayName}'),
-      literalList(invocationPositionalArgs),
+      invocationPositionalArgs.single,
     ]);
     final returnNoSuchMethod =
         refer('super').property('noSuchMethod').call([invocation]);
