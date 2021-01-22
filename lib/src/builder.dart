@@ -743,10 +743,10 @@ class _MockLibraryInfo {
       if (method.isPrivate || method.isStatic) {
         continue;
       }
-      if (overriddenMethods.contains(method)) {
+      var methodName = method.name;
+      if (overriddenMethods.contains(methodName)) {
         continue;
       }
-      var methodName = method.name;
       overriddenMethods.add(methodName);
       if (methodName == 'noSuchMethod') {
         continue;
