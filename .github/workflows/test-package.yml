@@ -57,7 +57,7 @@ jobs:
         name: Install dependencies
         run: dart pub get
       - name: Run VM tests
-        run: dart run build_runner test -- --platform vm --coverage var
+        run: dart run build_runner test -- --platform vm
         if: always() && steps.install.outcome == 'success'
       - name: Run DDC build
         run: dart run build_runner build --fail-on-severe
