@@ -992,7 +992,10 @@ _InOrderVerification get verifyInOrder {
     throw StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return <T>(List<T> _) {
+  return <T>(List<T> verifyOrderCalls) {
+    if (verifyOrderCalls.whereType<VerificationResult>().isNotEmpty) {
+      fail('verifyInOrder was called with a verify argument(s)');
+    }
     _verificationInProgress = false;
     var verificationResults = <VerificationResult>[];
     var time = DateTime.fromMillisecondsSinceEpoch(0);

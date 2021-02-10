@@ -466,6 +466,18 @@ void main() {
       });
     });
 
+    test('verify been used as an argument fails', () {
+      mock.methodWithoutArgs();
+      mock.getter;
+      expectFail(
+          'verifyInOrder was called with a verify argument(s)', () {
+        verifyInOrder([
+          verify(mock.getter),
+          verify(mock.methodWithoutArgs())
+        ]);
+      });
+    });
+
     test('methods can be called again and again', () {
       mock.methodWithoutArgs();
       mock.getter;
