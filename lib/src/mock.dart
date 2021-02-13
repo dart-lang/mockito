@@ -939,6 +939,10 @@ Verification _makeVerify(bool never) {
     }
     throw StateError(message);
   }
+  if (_verificationInProgress) {
+    fail('There is already a verification in progress, '
+        'check if it was not called with a verify argument(s)');
+  }
   _verificationInProgress = true;
   return <T>(T mock) {
     _verificationInProgress = false;
@@ -992,10 +996,7 @@ _InOrderVerification get verifyInOrder {
     throw StateError(_verifyCalls.join());
   }
   _verificationInProgress = true;
-  return <T>(List<T> verifyOrderCalls) {
-    if (verifyOrderCalls.whereType<VerificationResult>().isNotEmpty) {
-      fail('verifyInOrder was called with a verify argument(s)');
-    }
+  return <T>(List<T> _) {
     _verificationInProgress = false;
     var verificationResults = <VerificationResult>[];
     var time = DateTime.fromMillisecondsSinceEpoch(0);

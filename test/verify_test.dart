@@ -470,10 +470,11 @@ void main() {
       mock.methodWithoutArgs();
       mock.getter;
       expectFail(
-          'verifyInOrder was called with a verify argument(s)', () {
+          'There is already a verification in progress, '
+          'check if it was not called with a verify argument(s)', () {
         verifyInOrder([
           verify(mock.getter),
-          verify(mock.methodWithoutArgs())
+          verify(mock.methodWithoutArgs()),
         ]);
       });
     });
