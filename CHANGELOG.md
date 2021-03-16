@@ -1,6 +1,7 @@
 ## 5.0.2-dev
 
 * Support the latest build packages
+* Support the latest version of `dart_style`
 
 ## 5.0.1
 
