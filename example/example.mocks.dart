@@ -38,3 +38,27 @@ class MockCat extends _i1.Mock implements _i2.Cat {
       super.noSuchMethod(Invocation.method(#hunt, [place, prey]),
           returnValueForMissingStub: null);
 }
+
+/// A class which mocks [Cat].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCatRelaxed extends _i1.Mock implements _i2.Cat {
+  @override
+  int get lives =>
+      (super.noSuchMethod(Invocation.getter(#lives), returnValue: 0) as int);
+  @override
+  set lives(int? _lives) =>
+      super.noSuchMethod(Invocation.setter(#lives, _lives),
+          returnValueForMissingStub: null);
+  @override
+  _i3.Future<void> chew() => (super.noSuchMethod(Invocation.method(#chew, []),
+      returnValue: Future<void>.value(null),
+      returnValueForMissingStub: Future.value()) as _i3.Future<void>);
+  @override
+  void sleep() => super.noSuchMethod(Invocation.method(#sleep, []),
+      returnValueForMissingStub: null);
+  @override
+  void hunt(String? place, String? prey) =>
+      super.noSuchMethod(Invocation.method(#hunt, [place, prey]),
+          returnValueForMissingStub: null);
+}

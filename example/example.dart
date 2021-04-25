@@ -26,7 +26,11 @@ class FakeCat extends Fake implements Cat {
   }
 }
 
-@GenerateMocks([Cat])
+@GenerateMocks([
+  Cat
+], customMocks: [
+  MockSpec<Cat>(as: #MockCatRelaxed, returnNullOnMissingStub: true),
+])
 void main() {
   late Cat cat;
 
@@ -205,5 +209,19 @@ void main() {
 
     cat.eatFood('Milk'); // Prints 'Fake eat Milk'.
     expect(() => cat.sleep(), throwsUnimplementedError);
+  });
+
+  test('Relaxed mock class', () {
+    // Create a new mock Cat at runtime.
+    var cat = MockCatRelaxed();
+
+    // You can call it without stubbing.
+    cat.sleep();
+
+    // Returns null unless you stub it.
+    expect(cat.sound(), null);
+    expect(cat.eatFood('Milk'), null);
+
+    verify(cat.sleep());
   });
 }
