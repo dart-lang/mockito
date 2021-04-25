@@ -4,6 +4,7 @@ targets:
       mockito|mockBuilder:
         generate_for:
           - test/end2end/*.dart
+          - example/**.dart
 
 builders:
   mockBuilder:
