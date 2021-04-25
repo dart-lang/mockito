@@ -1,7 +1,10 @@
 // ignore_for_file: sdk_version_async_exported_from_core
 // ignore_for_file: unawaited_futures
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+
+import 'example.mocks.dart';
 
 // Real class
 class Cat {
@@ -14,9 +17,6 @@ class Cat {
   int lives = 9;
 }
 
-// Mock class
-class MockCat extends Mock implements Cat {}
-
 // Fake class
 class FakeCat extends Fake implements Cat {
   @override
@@ -26,6 +26,7 @@ class FakeCat extends Fake implements Cat {
   }
 }
 
+@GenerateMocks([Cat])
 void main() {
   late Cat cat;
 
