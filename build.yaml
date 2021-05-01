@@ -3,8 +3,8 @@ targets:
     builders:
       mockito|mockBuilder:
         generate_for:
-          - test/end2end/*.dart
           - example/**.dart
+          - test/end2end/*.dart
 
 builders:
   mockBuilder:
