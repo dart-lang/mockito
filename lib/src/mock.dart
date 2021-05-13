@@ -14,14 +14,10 @@
 
 import 'dart:async';
 
+import 'package:matcher/matcher.dart';
 import 'package:meta/meta.dart';
 import 'package:mockito/src/call_pair.dart';
 import 'package:mockito/src/invocation_matcher.dart';
-import 'package:test_api/test_api.dart';
-// TODO(srawlins): Remove this when we no longer need to check for an
-// incompatiblity between test_api and test.
-// https://github.com/dart-lang/mockito/issues/175
-import 'package:test_api/src/backend/invoker.dart';
 
 bool _whenInProgress = false;
 bool _untilCalledInProgress = false;
@@ -645,13 +641,13 @@ class _VerifyCall {
         var otherCalls = mock._realCallsToString();
         message = "No matching calls. All calls: $otherCalls";
       }
-      fail("$message\n"
+      _fail("$message\n"
           "(If you called `verify(...).called(0);`, please instead use "
           "`verifyNever(...);`.)");
     }
     if (never && matchingInvocations.isNotEmpty) {
       var calls = mock._realCallsToString();
-      fail("Unexpected calls. All calls: $calls");
+      _fail("Unexpected calls. All calls: $calls");
     }
     matchingInvocations.forEach((inv) {
       inv.verified = true;
@@ -800,8 +796,6 @@ class VerificationResult {
   /// The number of calls matched in this verification.
   int callCount;
 
-  bool _testApiMismatchHasBeenChecked = false;
-
   @Deprecated(
       'User-constructed VerificationResult is deprecated; this constructor may '
       'be deleted as early as Mockito 5.0.0')
@@ -810,41 +804,6 @@ class VerificationResult {
   VerificationResult._(this.callCount)
       : _captured = List<dynamic>.from(_capturedArgs, growable: false) {
     _capturedArgs.clear();
-  }
-
-  /// Check for a version incompatibility between mockito, test, and test_api.
-  ///
-  /// This incompatibility results in an inscrutible error for users. Catching
-  /// it here allows us to give some steps to fix.
-  // TODO(srawlins): Remove this when we don't need to check for an
-  // incompatiblity between test_api and test any more.
-  // https://github.com/dart-lang/mockito/issues/175
-  void _checkTestApiMismatch() {
-    try {
-      Invoker.current;
-    } on CastError catch (e) {
-      if (!e
-          .toString()
-          .contains("type 'Invoker' is not a subtype of type 'Invoker'")) {
-        // Hmm. This is a different CastError from the one we're trying to
-        // protect against. Let it go.
-        return;
-      }
-      print('Error: Package incompatibility between mockito, test, and '
-          'test_api packages:');
-      print('');
-      print('* mockito ^4.0.0 is incompatible with test <1.4.0');
-      print('* mockito <4.0.0 is incompatible with test ^1.4.0');
-      print('');
-      print('As mockito does not have a dependency on the test package, '
-          'nothing stopped you from landing in this situation. :( '
-          'Apologies.');
-      print('');
-      print('To fix: bump your dependency on the test package to something '
-          'like: ^1.4.0, or downgrade your dependency on mockito to something '
-          'like: ^3.0.0');
-      rethrow;
-    }
   }
 
   /// Assert that the number of calls matches [matcher].
@@ -857,15 +816,47 @@ class VerificationResult {
   ///
   /// To assert that a method was called zero times, use [verifyNever].
   void called(dynamic matcher) {
-    if (!_testApiMismatchHasBeenChecked) {
-      // Only execute the check below once. `Invoker.current` may look like a
-      // cheap getter, but it involves Zones and casting.
-      _testApiMismatchHasBeenChecked = true;
-      _checkTestApiMismatch();
+    const reason = 'Unexpected number of calls';
+    matcher = wrapMatcher(matcher);
+    var matchState = {};
+    if (matcher.matches(callCount, matchState) as bool) {
+      return;
     }
-    expect(callCount, wrapMatcher(matcher),
-        reason: "Unexpected number of calls");
+    String formatter(actual, Matcher matcher, String reason) {
+      var mismatchDescription = StringDescription();
+      matcher.describeMismatch(actual, mismatchDescription, matchState, false);
+      return _formatFailure(matcher, actual, mismatchDescription.toString(),
+          reason: reason);
+    }
+    _fail(formatter(callCount, matcher as Matcher, reason));
+    return;
   }
+}
+
+String _formatFailure(Matcher expected, actual, String which, {String reason}) {
+  var buffer = StringBuffer();
+  buffer.writeln(_indent(_prettyPrint(expected), first: 'Expected: '));
+  buffer.writeln(_indent(_prettyPrint(actual), first: '  Actual: '));
+  if (which.isNotEmpty) buffer.writeln(_indent(which, first: '   Which: '));
+  if (reason != null) buffer.writeln(reason);
+  return buffer.toString();
+}
+
+String _prettyPrint(value) => StringDescription().addDescriptionOf(value).toString();
+
+String _indent(String text, {@required String first}) {
+  final prefix = ' ' * first.length;
+  var lines = text.split('\n');
+  if (lines.length == 1) return '$first$text';
+
+  var buffer = StringBuffer('$first${lines.first}\n');
+
+  // Write out all but the first and last lines with [prefix].
+  for (var line in lines.skip(1).take(lines.length - 2)) {
+    buffer.writeln('$prefix$line');
+  }
+  buffer.write('$prefix${lines.last}');
+  return buffer.toString();
 }
 
 typedef Answering<T> = T Function(Invocation realInvocation);
@@ -935,7 +926,7 @@ Verification _makeVerify(bool never) {
       verifyCall._checkWith(never);
       return result;
     } else {
-      fail("Used on a non-mockito object");
+      _fail("Used on a non-mockito object");
     }
   };
 }
@@ -981,7 +972,7 @@ _InOrderVerification get verifyInOrder {
         if (allInvocations.isNotEmpty) {
           otherCalls = " All calls: ${allInvocations.join(", ")}";
         }
-        fail('Matching call #${tmpVerifyCalls.indexOf(verifyCall)} '
+        _fail('Matching call #${tmpVerifyCalls.indexOf(verifyCall)} '
             'not found.$otherCalls');
       }
     }
@@ -1002,7 +993,7 @@ void verifyNoMoreInteractions(var mock) {
   if (mock is Mock) {
     var unverified = mock._realCalls.where((inv) => !inv.verified).toList();
     if (unverified.isNotEmpty) {
-      fail("No more calls expected, but following found: " + unverified.join());
+      _fail("No more calls expected, but following found: " + unverified.join());
     }
   } else {
     _throwMockArgumentError('verifyNoMoreInteractions', mock);
@@ -1012,7 +1003,7 @@ void verifyNoMoreInteractions(var mock) {
 void verifyZeroInteractions(var mock) {
   if (mock is Mock) {
     if (mock._realCalls.isNotEmpty) {
-      fail("No interaction expected, but following found: " +
+      _fail("No interaction expected, but following found: " +
           mock._realCalls.join());
     }
   } else {
@@ -1102,4 +1093,15 @@ void resetMockitoState() {
   _capturedArgs.clear();
   _storedArgs.clear();
   _storedNamedArgs.clear();
+}
+
+Null _fail(String message) => throw MockFailure(message);
+
+class MockFailure {
+  final String message;
+
+  MockFailure(this.message);
+
+  @override
+  String toString() => message.toString();
 }

@@ -18,6 +18,7 @@
 library mockito.test.deprecated_apis.verify_test;
 
 import 'package:mockito/mockito.dart';
+import 'package:mockito/src/mock.dart';
 import 'package:test/test.dart';
 
 class _RealClass {
@@ -62,7 +63,7 @@ void expectFail(String expectedMessage, dynamic expectedToFail()) {
     expectedToFail();
     fail('It was expected to fail!');
   } catch (e) {
-    if (!(e is TestFailure)) {
+    if (!(e is MockFailure)) {
       rethrow;
     } else {
       if (expectedMessage != e.message) {

@@ -1,3 +1,7 @@
+## 4.1.1+2
+
+* Remove test\_api dependency.
+
 ## 4.1.1+1
 
 * Allow test\_api 0.3.x.

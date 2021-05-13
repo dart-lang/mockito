@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:mockito/mockito.dart';
+import 'package:mockito/src/mock.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';
@@ -58,7 +59,7 @@ void expectFail(Pattern expectedMessage, dynamic expectedToFail()) {
   try {
     expectedToFail();
     fail('It was expected to fail!');
-  } on TestFailure catch (e) {
+  } on MockFailure catch (e) {
     expect(e.message,
         expectedMessage is String ? expectedMessage : contains(expectedMessage),
         reason: 'Failed but with unexpected message');
