@@ -78,6 +78,8 @@ class MockBuilder implements Builder {
           Code('\n\n// ignore_for_file: avoid_redundant_argument_values\n'));
       // We don't properly prefix imported class names in doc comments.
       b.body.add(Code('// ignore_for_file: comment_references\n'));
+      // We might import a package's 'src' directory.
+      b.body.add(Code('// ignore_for_file: implementation_imports\n'));
       // `Mock.noSuchMethod` is `@visibleForTesting`, but the generated code is
       // not always in a test directory; the Mockito `example/iss` tests, for
       // example.
@@ -148,6 +150,7 @@ $rawOutput
     for (final element in elements) {
       final elementLibrary = element.library!;
       if (elementLibrary.isInSdk) {
+        // ignore:unnecessary_non_null_assertion
         if (elementLibrary.name!.startsWith('dart._')) {
           typeUris[element] = _findPublicExportOf(
               Queue.of(librariesWithTypes), elementLibrary)!;
@@ -693,14 +696,6 @@ class _MockTargetGatherer {
 }
 
 class _MockLibraryInfo {
-  final bool sourceLibIsNonNullable;
-
-  /// The type provider which applies to the source library.
-  final TypeProvider typeProvider;
-
-  /// The type system which applies to the source library.
-  final TypeSystem typeSystem;
-
   /// Mock classes to be added to the generated library.
   final mockClasses = <Class>[];
 
@@ -721,30 +716,55 @@ class _MockLibraryInfo {
   /// Asset-resolving while building the mock library.
   final Map<Element, String> assetUris;
 
-  /// A mapping of any fallback generators specified for the classes-to-mock.
-  ///
-  /// Each value is another mapping from method names to the generator
-  /// function elements.
-  final Map<ClassElement, Map<String, ExecutableElement>> fallbackGenerators;
-
   /// Build mock classes for [mockTargets].
   _MockLibraryInfo(
     Iterable<_MockTarget> mockTargets, {
     required this.assetUris,
     required LibraryElement entryLib,
-  })  : sourceLibIsNonNullable = entryLib.isNonNullableByDefault,
-        typeProvider = entryLib.typeProvider,
-        typeSystem = entryLib.typeSystem,
-        fallbackGenerators = {
-          for (final mockTarget in mockTargets)
-            mockTarget.classElement: mockTarget.fallbackGenerators
-        } {
+  }) {
     for (final mockTarget in mockTargets) {
-      mockClasses.add(_buildMockClass(mockTarget));
+      final fallbackGenerators = mockTarget.fallbackGenerators;
+      mockClasses.add(_MockClassInfo(
+        mockTarget: mockTarget,
+        sourceLibIsNonNullable: entryLib.isNonNullableByDefault,
+        typeProvider: entryLib.typeProvider,
+        typeSystem: entryLib.typeSystem,
+        mockLibraryInfo: this,
+        fallbackGenerators: fallbackGenerators,
+      )._buildMockClass());
     }
   }
+}
 
-  Class _buildMockClass(_MockTarget mockTarget) {
+class _MockClassInfo {
+  final _MockTarget mockTarget;
+
+  final bool sourceLibIsNonNullable;
+
+  /// The type provider which applies to the source library.
+  final TypeProvider typeProvider;
+
+  /// The type system which applies to the source library.
+  final TypeSystem typeSystem;
+
+  final _MockLibraryInfo mockLibraryInfo;
+
+  /// A mapping of any fallback generators specified for the classes-to-mock.
+  ///
+  /// Each value is another mapping from method names to the generator
+  /// function elements.
+  final Map<String, ExecutableElement> fallbackGenerators;
+
+  _MockClassInfo({
+    required this.mockTarget,
+    required this.sourceLibIsNonNullable,
+    required this.typeProvider,
+    required this.typeSystem,
+    required this.mockLibraryInfo,
+    required this.fallbackGenerators,
+  });
+
+  Class _buildMockClass() {
     final typeToMock = mockTarget.classType;
     final classToMock = mockTarget.classElement;
     final classIsImmutable = classToMock.metadata.any((it) => it.isImmutable);
@@ -987,12 +1007,10 @@ class _MockLibraryInfo {
     if (method.returnType.isVoid) {
       returnValueForMissingStub = refer('null');
     } else if (method.returnType.isFutureOfVoid) {
-      returnValueForMissingStub = _futureReference().property('value').call([]);
+      returnValueForMissingStub =
+          _futureReference(refer('void')).property('value').call([]);
     }
-    final class_ = method.enclosingElement;
-    final fallbackGenerator = fallbackGenerators.containsKey(class_)
-        ? fallbackGenerators[class_]![method.name]
-        : null;
+    final fallbackGenerator = fallbackGenerators[method.name];
     final namedArgs = {
       if (fallbackGenerator != null)
         'returnValue': _fallbackGeneratorCode(method, fallbackGenerator)
@@ -1044,6 +1062,8 @@ class _MockLibraryInfo {
       return literalFalse;
     } else if (type.isDartCoreDouble) {
       return literalNum(0.0);
+    } else if (type.isDartCoreFunction) {
+      return refer('() {}');
     } else if (type.isDartAsyncFuture || type.isDartAsyncFutureOr) {
       final typeArgument = typeArguments.first;
       final futureValueArguments =
@@ -1146,7 +1166,7 @@ class _MockLibraryInfo {
       // fake for a different Foo, they will collide.
       final fakeName = '_Fake${elementToFake.name}';
       // Only make one fake class for each class that needs to be faked.
-      if (!fakedClassElements.contains(elementToFake)) {
+      if (!mockLibraryInfo.fakedClassElements.contains(elementToFake)) {
         _addFakeClass(fakeName, elementToFake);
       }
       final typeArguments = dartType.typeArguments;
@@ -1160,7 +1180,7 @@ class _MockLibraryInfo {
 
   /// Adds a [Fake] implementation of [elementToFake], named [fakeName].
   void _addFakeClass(String fakeName, ClassElement elementToFake) {
-    fakeClasses.add(Class((cBuilder) {
+    mockLibraryInfo.fakeClasses.add(Class((cBuilder) {
       // For each type parameter on [elementToFake], the Fake class needs a type
       // parameter with same type variables, and a mirrored type argument for
       // the "implements" clause.
@@ -1190,7 +1210,7 @@ class _MockLibraryInfo {
             (mBuilder) => _buildOverridingMethod(mBuilder, toStringMethod)));
       }
     }));
-    fakedClassElements.add(elementToFake);
+    mockLibraryInfo.fakedClassElements.add(elementToFake);
   }
 
   /// Returns a [Parameter] which matches [parameter].
@@ -1458,10 +1478,10 @@ class _MockLibraryInfo {
     // For types like `dynamic`, return null; no import needed.
     if (element?.library == null) return null;
 
-    assert(assetUris.containsKey(element),
+    assert(mockLibraryInfo.assetUris.containsKey(element),
         'An element, "$element", is missing from the asset URI mapping');
 
-    return assetUris[element]!;
+    return mockLibraryInfo.assetUris[element]!;
   }
 
   /// Returns a [Reference] to [symbol] with [url].

@@ -120,8 +120,7 @@ void main() {
 
   /// Test [MockBuilder] on a single source file, in a package which has opted
   /// into null safety, and with the non-nullable experiment enabled.
-  Future<void> expectSingleNonNullableOutput(
-      String sourceAssetText,
+  Future<void> expectSingleNonNullableOutput(String sourceAssetText,
       /*String|Matcher<List<int>>*/ Object output) async {
     await testWithNonNullable({
       ...metaAssets,
@@ -527,7 +526,7 @@ void main() {
       _containsAllOf(dedent2('''
       _i3.Future<void> m() => (super.noSuchMethod(Invocation.method(#m, []),
           returnValue: Future<void>.value(),
-          returnValueForMissingStub: Future.value()) as _i3.Future<void>);
+          returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
       ''')),
     );
   });
@@ -1895,6 +1894,22 @@ void main() {
       _containsAllOf(dedent2('''
       _i3.Future<bool> m() => (super.noSuchMethod(Invocation.method(#m, []),
           returnValue: Future<bool>.value(false)) as _i3.Future<bool>);
+      ''')),
+    );
+  });
+
+  test(
+      'creates dummy non-null return values for Futures of core Function class',
+      () async {
+    await expectSingleNonNullableOutput(
+      dedent('''
+      abstract class Foo {
+        Future<Function> m();
+      }
+      '''),
+      _containsAllOf(dedent2('''
+      _i3.Future<Function> m() => (super.noSuchMethod(Invocation.method(#m, []),
+          returnValue: Future<Function>.value(() {})) as _i3.Future<Function>);
       ''')),
     );
   });
