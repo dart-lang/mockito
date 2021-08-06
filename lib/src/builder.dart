@@ -1249,7 +1249,8 @@ class _MockClassInfo {
   }
 
   /// Creates a code_builder [Expression] from [object], a constant object from
-  /// analyzer.
+  /// analyzer and [parameter], an optional [ParameterElement], when the
+  /// expression is created for a method parameter.
   ///
   /// This is very similar to Angular's revive code, in
   /// angular_compiler/analyzer/di/injector.dart.
