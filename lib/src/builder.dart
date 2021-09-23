@@ -98,6 +98,7 @@ class MockBuilder implements Builder {
       b.body.add(Code('// ignore_for_file: camel_case_types\n'));
       b.body.add(Code('// ignore_for_file: always_specify_types\n'));
       b.body.add(Code('// ignore_for_file: unnecessary_overrides\n'));
+      b.body.add(Code('// ignore_for_file: implementation_imports\n'));
       b.body.add(Code('// ignore_for_file: avoid_implementing_value_types\n\n'));
       b.body.addAll(mockLibraryInfo.fakeClasses);
       b.body.addAll(mockLibraryInfo.mockClasses);
