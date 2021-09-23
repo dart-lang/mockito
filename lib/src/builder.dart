@@ -95,9 +95,9 @@ class MockBuilder implements Builder {
       // The code_builder `asA` API unconditionally adds defensive parentheses.
       b.body.add(Code('// ignore_for_file: unnecessary_parenthesis\n'));
       // The generator appends a suffix to fake classes
-      b.body.add(Code('// ignore_for_file: camel_case_types\n\n'));
-      b.body.add(Code('// ignore_for_file: always_specify_types\n\n'));
-      b.body.add(Code('// ignore_for_file: unnecessary_overrides\n\n'));
+      b.body.add(Code('// ignore_for_file: camel_case_types\n'));
+      b.body.add(Code('// ignore_for_file: always_specify_types\n'));
+      b.body.add(Code('// ignore_for_file: unnecessary_overrides\n'));
       b.body.add(Code('// ignore_for_file: avoid_implementing_value_types\n\n'));
       b.body.addAll(mockLibraryInfo.fakeClasses);
       b.body.addAll(mockLibraryInfo.mockClasses);
