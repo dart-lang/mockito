@@ -7,7 +7,7 @@ Mock library for Dart inspired by [Mockito](https://github.com/mockito/mockito).
 
 ## Let's create mocks
 
-Mockito 5.0.0 supports Dart's new **null safety** language feature in Dart 2.12,
+Mockito 5.1.0 supports Dart's new **null safety** language feature in Dart 2.12,
 primarily with code generation.
 
 To use Mockito's generated mock classes, add a `build_runner` dependency in your
