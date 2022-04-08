@@ -699,7 +699,7 @@ class _MockTargetGatherer {
             '${enclosingElement.fullName} features a non-nullable unknown '
             'return type, and cannot be stubbed. Try generating this mock with '
             "a MockSpec with 'unsupportedMembers' or a dummy generator (see "
-            'https://pub.dev/documentation/mockito/latest/annotations/MockSpec-class.html).');
+            'https://pub.dev/documentation/mockito/latest/annotations/MockSpec-class.html ).');
       }
     }
 

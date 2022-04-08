@@ -234,7 +234,7 @@ class MissingStubError extends Error {
       "Add a stub for this method using Mockito's 'when' API, or generate the "
       '${receiver.runtimeType} mock with a MockSpec with '
       "'returnNullOnMissingStub: true' (see "
-      'https://pub.dev/documentation/mockito/latest/annotations/MockSpec-class.html).';
+      'https://pub.dev/documentation/mockito/latest/annotations/MockSpec-class.html ).';
 }
 
 typedef _ReturnsCannedResponse = CallPair<dynamic> Function();
