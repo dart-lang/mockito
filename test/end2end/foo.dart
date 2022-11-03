@@ -19,9 +19,6 @@ class Foo<T> {
   set setter(int? value) {}
   void returnsVoid() {}
   Future<void> returnsFutureVoid() => Future.value();
-  void returnsVoidWithJsonArg(Map<String, dynamic> x) => null;
-  Future<void> returnsFutureVoidWithJsonArg(Map<String, dynamic> x) =>
-      Future.value();
   Future<void>? returnsNullableFutureVoid() => Future.value();
   Bar returnsBar(int arg) => Bar();
 }
