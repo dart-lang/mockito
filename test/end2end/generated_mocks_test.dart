@@ -175,6 +175,33 @@ void main() {
       );
     });
 
+    test('an unstubbed method with a json parameter throws', () {
+      expect(
+        () => foo.returnsVoidWithJsonArg({'answer':  42}),
+        throwsA(TypeMatcher<MissingStubError>().having((e) => e.toString(),
+            'toString()', contains('returnsVoidWithJsonArg({answer: 42})'))),
+      );
+    });
+
+    test(
+        'an unstubbed method returning a future throws', () {
+      expect(
+        () => foo.returnsFutureVoid(),
+        throwsA(TypeMatcher<MissingStubError>().having((e) => e.toString(),
+            'toString()', contains('TODO'))),
+      );
+    });
+
+    test(
+        'an unstubbed method with a json parameter and returning a future '
+        'throws', () {
+      expect(
+        () => foo.returnsFutureVoidWithJsonArg({'answer':  42}),
+        throwsA(TypeMatcher<MissingStubError>().having((e) => e.toString(),
+            'toString()', contains('TODO'))),
+      );
+    });
+
     test('an unstubbed getter throws', () {
       expect(
         () => foo.getter,
