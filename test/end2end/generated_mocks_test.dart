@@ -51,6 +51,7 @@ T Function(T) returnsGenericFunctionShim<T>() => (T _) => null as T;
       #$hasDollarInName: returnsTypeVariableShim,
     },
   ),
+  MockSpec<Baz>(as: #MockBazWithDefaultDummyValue),
   MockSpec<HasPrivate>(mixingIn: [HasPrivateMixin]),
 ])
 @GenerateNiceMocks([MockSpec<Foo>(as: #MockFooNice)])
@@ -186,25 +187,30 @@ void main() {
     });
   });
 
-  group('for a generated mock using unsupportedMembers', () {
-    late Baz baz;
+  // TODO: please review and verify I can delete this test
+  //I think this is not not expected any more since we support non-nullable
+  // return types now. So the unsupportedMembers should only take effect
+  // if we can not generate code for a members.
 
-    setUp(() {
-      baz = MockBazWithUnsupportedMembers();
-    });
+  // group('for a generated mock using unsupportedMembers', () {
+  //   late Baz baz;
 
-    test('a real method call throws', () {
-      expect(() => baz.returnsTypeVariable(), throwsUnsupportedError);
-    });
+  //   setUp(() {
+  //     baz = MockBazWithUnsupportedMembers();
+  //   });
 
-    test('a real getter call (or field access) throws', () {
-      expect(() => baz.typeVariableField, throwsUnsupportedError);
-    });
+  //   test('a real method call throws', () {
+  //     expect(() => baz.returnsTypeVariable(), throwsUnsupportedError);
+  //   });
 
-    test('a real call to a method whose name has a \$ in it throws', () {
-      expect(() => baz.$hasDollarInName(), throwsUnsupportedError);
-    });
-  });
+  //   test('a real getter call (or field access) throws', () {
+  //     expect(() => baz.typeVariableField, throwsUnsupportedError);
+  //   });
+
+  //   test('a real call to a method whose name has a \$ in it throws', () {
+  //     expect(() => baz.$hasDollarInName(), throwsUnsupportedError);
+  //   });
+  // });
 
   group('for a generated mock using fallbackGenerators,', () {
     late Baz baz;
@@ -228,6 +234,46 @@ void main() {
         'type can be called', () {
       when(baz.returnsTypeVariable()).thenReturn(3);
       baz.returnsTypeVariable();
+    });
+  });
+
+  group('for a generated mock using defaultDummyValue(),', () {
+    late Baz baz;
+
+    setUp(() {
+      baz = MockBazWithDefaultDummyValue<Foo<int>>();
+    });
+
+    test('a method with a type variable return type can be called', () {
+      when(baz.returnsTypeVariable<int>()).thenReturn(3);
+      baz.returnsTypeVariable();
+    });
+
+    test('a method with a bounded type variable return type can be called', () {
+      when(baz.returnsBoundedTypeVariable()).thenReturn(3);
+      baz.returnsBoundedTypeVariable();
+    });
+
+    test(
+        'a method with multiple type parameters and a type variable return '
+        'type can be called', () {
+      when(baz.returnsTypeVariable()).thenReturn(3);
+      baz.returnsTypeVariable();
+    });
+
+    test(
+      'access typeVariableField will throw UnsupportedError before '
+      'setting default via setDefaultDummyValue',
+      () => expect(() => baz.typeVariableField, throwsUnsupportedError),
+    );
+
+    test(
+        'typeVariableField can be accessed after setting default '
+        'via setDefaultDummyValue', () {
+      var value = const Foo<int>();
+      setDefaultDummyValue<Foo<int>>(value);
+      when(baz.typeVariableField).thenReturn(value);
+      expect(baz.typeVariableField, value);
     });
   });
 

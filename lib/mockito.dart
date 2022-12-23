@@ -51,4 +51,8 @@ export 'src/mock.dart'
         logInvocations,
         untilCalled,
         MissingStubError,
-        FakeUsedError;
+        FakeUsedError,
+
+        //to support non-nullable return types
+        defaultDummyValue,
+        setDefaultDummyValue;

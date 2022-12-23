@@ -1576,7 +1576,7 @@ void main() {
           FutureOr<R> m<R>();
         }
         '''),
-      _containsAllOf('_i2.FutureOr<R> m<R>() => (super.noSuchMethod('),
+      _containsAllOf('_i3.FutureOr<R> m<R>() => (super.noSuchMethod('),
     );
   });
 
@@ -2310,7 +2310,7 @@ void main() {
         Future<T> m<T>() async => false;
       }
       '''),
-      _containsAllOf('returnValue: _FakeFuture_0<T>('),
+      _containsAllOf('returnValue: _i3.Future<T>.value(_i1.defaultDummyValue'),
     );
   });
 
@@ -3037,79 +3037,55 @@ void main() {
   });
 
   test(
-      'throws when GenerateMocks is given a class with a getter with a '
-      'non-nullable class-declared type variable type', () async {
-    _expectBuilderThrows(
-      assets: {
-        ...annotationsAsset,
-        ...simpleTestAsset,
-        'foo|lib/foo.dart': dedent('''
+      'GenerateMocks works given class with a getter with a non-nullable '
+      'class-declared type variable type', () async {
+    await expectSingleNonNullableOutput(
+      dedent('''
         abstract class Foo<T> {
           T get f;
         }
         '''),
-      },
-      message: contains(
-          "The property accessor 'Foo.f' features a non-nullable unknown "
-          'return type, and cannot be stubbed'),
+      _containsAllOf('returnValue: _i1.defaultDummyValue<T>()'),
     );
   });
 
   test(
-      'throws when GenerateMocks is given a class with a method with a '
+      'GenerateMocks works given a class with a method with a '
       'non-nullable class-declared type variable return type', () async {
-    _expectBuilderThrows(
-      assets: {
-        ...annotationsAsset,
-        ...simpleTestAsset,
-        'foo|lib/foo.dart': dedent('''
+    await expectSingleNonNullableOutput(
+      dedent('''
         abstract class Foo<T> {
           T m(int a);
         }
         '''),
-      },
-      message: contains(
-          "The method 'Foo.m' features a non-nullable unknown return type, and "
-          'cannot be stubbed'),
+      _containsAllOf('returnValue: _i1.defaultDummyValue<T>()'),
     );
   });
 
   test(
-      'throws when GenerateMocks is given a class with a method with a '
+      'GenerateMocks works given a class with a method with a '
       'non-nullable method-declared type variable return type', () async {
-    _expectBuilderThrows(
-      assets: {
-        ...annotationsAsset,
-        ...simpleTestAsset,
-        'foo|lib/foo.dart': dedent('''
+    await expectSingleNonNullableOutput(
+      dedent('''
         abstract class Foo {
           T m<T>(int a);
         }
         '''),
-      },
-      message: contains(
-          "The method 'Foo.m' features a non-nullable unknown return type, and "
-          'cannot be stubbed'),
+      _containsAllOf('returnValue: _i1.defaultDummyValue<T>()'),
     );
   });
 
   test(
-      'throws when GenerateMocks is given a class with a method with a '
+      'GenerateMocks works given a class with a method with a '
       'non-nullable method-declared bounded type variable return type',
       () async {
-    _expectBuilderThrows(
-      assets: {
-        ...annotationsAsset,
-        ...simpleTestAsset,
-        'foo|lib/foo.dart': dedent('''
+    await expectSingleNonNullableOutput(
+      dedent('''
         abstract class Foo {
           T m<T extends num>(int a);
         }
         '''),
-      },
-      message: contains(
-          "The method 'Foo.m' features a non-nullable unknown return type, and "
-          'cannot be stubbed'),
+      _containsAllOf('returnValue: _i1.defaultDummyValue<T>()'),
     );
   });
 

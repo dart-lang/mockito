@@ -1267,3 +1267,27 @@ extension ListOfVerificationResult on List<VerificationResult> {
   /// [verifyInOrder].
   List<List<dynamic>> get captured => [...map((result) => result.captured)];
 }
+
+final _defaultDummyValueFor = <Type, dynamic>{
+  num: 0,
+  int: 0,
+  double: 0.0,
+  bool: false,
+  String: '',
+};
+
+void setDefaultDummyValue<T>(T value) {
+  _defaultDummyValueFor[T] = value;
+}
+
+T defaultDummyValue<T>() {
+  if (null is T) {
+    return null as T;
+  }
+  if (_defaultDummyValueFor.containsKey(T)) {
+    return _defaultDummyValueFor[T] as T;
+  } else {
+    throw UnsupportedError('No default dummy value specified for $T, '
+        'call setDefaultDummyValue<$T>(value) to set one');
+  }
+}
