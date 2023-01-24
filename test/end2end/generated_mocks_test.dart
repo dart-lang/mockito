@@ -187,31 +187,6 @@ void main() {
     });
   });
 
-  // TODO: please review and verify I can delete this test
-  //I think this is not not expected any more since we support non-nullable
-  // return types now. So the unsupportedMembers should only take effect
-  // if we can not generate code for a members.
-
-  // group('for a generated mock using unsupportedMembers', () {
-  //   late Baz baz;
-
-  //   setUp(() {
-  //     baz = MockBazWithUnsupportedMembers();
-  //   });
-
-  //   test('a real method call throws', () {
-  //     expect(() => baz.returnsTypeVariable(), throwsUnsupportedError);
-  //   });
-
-  //   test('a real getter call (or field access) throws', () {
-  //     expect(() => baz.typeVariableField, throwsUnsupportedError);
-  //   });
-
-  //   test('a real call to a method whose name has a \$ in it throws', () {
-  //     expect(() => baz.$hasDollarInName(), throwsUnsupportedError);
-  //   });
-  // });
-
   group('for a generated mock using fallbackGenerators,', () {
     late Baz baz;
 
@@ -232,8 +207,8 @@ void main() {
     test(
         'a method with multiple type parameters and a type variable return '
         'type can be called', () {
-      when(baz.returnsTypeVariable()).thenReturn(3);
-      baz.returnsTypeVariable();
+      when(baz.returnsTypeVariableFromTwo()).thenReturn(3);
+      baz.returnsTypeVariableFromTwo();
     });
   });
 
@@ -257,8 +232,8 @@ void main() {
     test(
         'a method with multiple type parameters and a type variable return '
         'type can be called', () {
-      when(baz.returnsTypeVariable()).thenReturn(3);
-      baz.returnsTypeVariable();
+      when(baz.returnsTypeVariableFromTwo()).thenReturn(3);
+      baz.returnsTypeVariableFromTwo();
     });
 
     test(
@@ -274,6 +249,12 @@ void main() {
       setDefaultDummyValue<Foo<int>>(value);
       when(baz.typeVariableField).thenReturn(value);
       expect(baz.typeVariableField, value);
+    });
+
+    test('setDefaultDummyValue() without type wont make harm', () {
+      setDefaultDummyValue('string');
+      when(baz.returnsTypeVariable<int>()).thenReturn(3);
+      expect(baz.returnsTypeVariable(), 3);
     });
   });
 

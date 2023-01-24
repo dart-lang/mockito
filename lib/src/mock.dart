@@ -1287,7 +1287,7 @@ T defaultDummyValue<T>() {
   if (_defaultDummyValueFor.containsKey(T)) {
     return _defaultDummyValueFor[T] as T;
   } else {
-    throw UnsupportedError('No default dummy value specified for $T, '
-        'call setDefaultDummyValue<$T>(value) to set one');
+    throw UnsupportedError("No default dummy value specified for '$T', "
+        'call `setDefaultDummyValue<$T>(value)` to set one');
   }
 }
