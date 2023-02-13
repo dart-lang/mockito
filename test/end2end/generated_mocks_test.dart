@@ -251,7 +251,7 @@ void main() {
       expect(baz.typeVariableField, value);
     });
 
-    test('setDefaultDummyValue() without type wont make harm', () {
+    test('calling setDefaultDummyValue() without type does not throw', () {
       setDefaultDummyValue('string');
       when(baz.returnsTypeVariable<int>()).thenReturn(3);
       expect(baz.returnsTypeVariable(), 3);

@@ -1268,7 +1268,7 @@ extension ListOfVerificationResult on List<VerificationResult> {
   List<List<dynamic>> get captured => [...map((result) => result.captured)];
 }
 
-final _defaultDummyValueFor = <Type, dynamic>{
+final _defaultDummyValueFor = <Type, Object?>{
   num: 0,
   int: 0,
   double: 0.0,
