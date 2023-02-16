@@ -3050,7 +3050,7 @@ void main() {
   });
 
   test(
-      'uses defaultDummyValue, given a a class with a method with a '
+      'uses defaultDummyValue, given a class with a method with a '
       'non-nullable class-declared type variable return type', () async {
     await expectSingleNonNullableOutput(
       dedent('''

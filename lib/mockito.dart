@@ -53,6 +53,6 @@ export 'src/mock.dart'
         MissingStubError,
         FakeUsedError,
 
-        //to support non-nullable return types
+        // -- dummy instance creation
         defaultDummyValue,
         setDefaultDummyValue;
