@@ -298,6 +298,25 @@ void main() {
       expect(foo.returnsBar(43), isA<SmartFake>());
     });
 
+    test('an unstubbed method returning a function returns a value', () {
+      expect(foo.returnsFunction(), isA<Function>());
+      expect(() => foo.returnsFunction()(1, 2), throwsA(isA<Object>()));
+    });
+
+    test('an unstubbed method returning a generic function returns a value',
+        () {
+      expect(foo.returnsGenericFunction(), isA<Function>());
+      expect(() => foo.returnsGenericFunction()(1), throwsA(isA<Object>()));
+    });
+
+    test(
+        'an unstubbed method returning a function with named arguments returns a value',
+        () {
+      expect(foo.returnsFunctionWithNamedArg(), isA<Function>());
+      expect(() => foo.returnsFunctionWithNamedArg()(1, named: 2),
+          throwsA(isA<Object>()));
+    });
+
     test('a fake throws a FakeUsedError if a getter is called', () {
       when(foo.returnsBar(42)).thenReturn(Bar());
       final bar = foo.returnsBar(43);

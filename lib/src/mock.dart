@@ -19,13 +19,13 @@
 
 import 'dart:async';
 
+import 'package:matcher/expect.dart';
 import 'package:meta/meta.dart';
 import 'package:mockito/src/call_pair.dart';
 import 'package:mockito/src/invocation_matcher.dart';
+import 'package:mockito/src/dummies.dart';
 // ignore: deprecated_member_use
 import 'package:test_api/fake.dart';
-// ignore: deprecated_member_use
-import 'package:test_api/test_api.dart';
 
 /// Whether a [when] call is "in progress."
 ///
@@ -156,26 +156,27 @@ class Mock {
   @visibleForTesting
   dynamic noSuchMethod(Invocation invocation,
       {Object? returnValue,
-      Object? returnValueForMissingStub = deferToDefaultResponse}) {
+      Object? returnValueForMissingStub = deferToDefaultResponse,
+      Dummy dummy = const DummyFor<Null>()}) {
     // noSuchMethod is that 'magic' that allows us to ignore implementing fields
     // and methods and instead define them later at compile-time per instance.
     invocation = _useMatchedInvocationIfSet(invocation);
     if (_whenInProgress) {
       _whenCall = _WhenCall(this, invocation);
-      return returnValue;
+      return returnValue ?? dummy.value(this, invocation);
     } else if (_verificationInProgress) {
       _verifyCalls.add(_VerifyCall(this, invocation));
-      return returnValue;
+      return returnValue ?? dummy.value(this, invocation);
     } else if (_untilCalledInProgress) {
       _untilCall = _UntilCall(this, invocation);
-      return returnValue;
+      return returnValue ?? dummy.value(this, invocation);
     } else {
       _ReturnsCannedResponse defaultResponse;
       if (returnValueForMissingStub == deferToDefaultResponse) {
         defaultResponse = _defaultResponse;
       } else {
-        defaultResponse = () =>
-            CallPair<Object?>.allInvocations((_) => returnValueForMissingStub);
+        defaultResponse = () => CallPair<Object?>.allInvocations(
+            (_) => returnValueForMissingStub ?? dummy.value(this, invocation));
       }
       _realCalls.add(RealCall(this, invocation));
       _invocationStreamController.add(invocation);
@@ -284,6 +285,29 @@ class FakeUsedError extends Error {
       '${createdStackTrace.toString()}\n\n'
       "However, member '${_symbolToString(invocation.memberName)}' of the "
       'created fake object was accessed.\n'
+      'Add a stub for '
+      "${receiver.runtimeType}.$_memberName using Mockito's 'when' API.\n";
+}
+
+class FakeFunctionUsedError extends Error {
+  final Invocation parentInvocation;
+  final Object receiver;
+  final StackTrace createdStackTrace;
+  final String _memberName;
+
+  FakeFunctionUsedError(
+      this.parentInvocation, this.receiver, this.createdStackTrace)
+      : _memberName = _symbolToString(parentInvocation.memberName);
+
+  @override
+  String toString() => "FakeFunctionUsedError: '$_memberName'\n"
+      'No stub was found which matches the argument of this method call:\n'
+      '${parentInvocation.toPrettyString()}\n\n'
+      'A fake function was created for this call, in the hope that it '
+      "won't be ever called.\n"
+      "Here is the stack trace where '$_memberName' was called:\n\n"
+      '${createdStackTrace.toString()}\n\n'
+      'However, the fake function was called.\n'
       'Add a stub for '
       "${receiver.runtimeType}.$_memberName using Mockito's 'when' API.\n";
 }

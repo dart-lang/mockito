@@ -52,3 +52,5 @@ export 'src/mock.dart'
         untilCalled,
         MissingStubError,
         FakeUsedError;
+
+export 'src/dummies.dart' show provideDummyBuilder, provideDummy;

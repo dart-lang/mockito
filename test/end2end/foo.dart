@@ -21,6 +21,10 @@ class Foo<T> {
   Future<void> returnsFutureVoid() => Future.value();
   Future<void>? returnsNullableFutureVoid() => Future.value();
   Bar returnsBar(int arg) => Bar();
+  Bar Function(int, [int?]) returnsFunction() => (i, [_]) => Bar();
+  Bar Function(int, {required int named}) returnsFunctionWithNamedArg() =>
+      (i, {required int named}) => Bar();
+  List<R> Function<R>(R) returnsGenericFunction() => <R>(r) => [r];
 }
 
 class Bar {

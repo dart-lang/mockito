@@ -771,7 +771,7 @@ void main() {
       '''),
         _containsAllOf(
           '  void List(int? a) => super.noSuchMethod(\n',
-          '  _i3.List<String> m() => (super.noSuchMethod(\n',
+          '  _i4.List<String> m() => (super.noSuchMethod(\n',
         ));
   });
 
@@ -1329,7 +1329,7 @@ void main() {
       '''),
       _containsAllOf(
         "import 'dart:core' hide List;",
-        "import 'dart:core' as _i3;",
+        "import 'dart:core' as _i4;",
       ),
     );
   });
@@ -1343,7 +1343,7 @@ void main() {
       }
       '''),
       _containsAllOf(
-          'dynamic m(void Function(_i2.Foo)? a) => super.noSuchMethod(Invocation.method('),
+          'dynamic m(void Function(_i2.Foo)? a) => super.noSuchMethod('),
     );
   });
 
@@ -1576,7 +1576,7 @@ void main() {
           FutureOr<R> m<R>();
         }
         '''),
-      _containsAllOf('_i2.FutureOr<R> m<R>() => (super.noSuchMethod('),
+      _containsAllOf('_i3.FutureOr<R> m<R>() => (super.noSuchMethod('),
     );
   });
 
@@ -1729,8 +1729,7 @@ void main() {
           m(int a);
         }
         '''),
-      _containsAllOf(
-          'dynamic m(int? a) => super.noSuchMethod(Invocation.method('),
+      _containsAllOf('dynamic m(int? a) => super.noSuchMethod('),
     );
   });
 
@@ -1741,8 +1740,7 @@ void main() {
         dynamic f(int a);
       }
       '''),
-      _containsAllOf(
-          'dynamic f(int? a) => super.noSuchMethod(Invocation.method('),
+      _containsAllOf('dynamic f(int? a) => super.noSuchMethod('),
     );
   });
 
@@ -1858,7 +1856,7 @@ void main() {
                 #m,
                 [],
               ),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
         ''')),
     );
@@ -1921,7 +1919,7 @@ void main() {
       _containsAllOf(dedent2('''
         int get m => (super.noSuchMethod(
               Invocation.getter(#m),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
         ''')),
     );
@@ -1947,7 +1945,7 @@ void main() {
       _containsAllOf(dedent2('''
         int get m => (super.noSuchMethod(
               Invocation.getter(#m),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
         ''')),
     );
@@ -2047,7 +2045,7 @@ void main() {
       _containsAllOf(dedent2('''
         int get m => (super.noSuchMethod(
               Invocation.getter(#m),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
       '''), dedent2('''
         set m(int? _m) => super.noSuchMethod(
@@ -2072,7 +2070,7 @@ void main() {
       _containsAllOf(dedent2('''
         int get m => (super.noSuchMethod(
               Invocation.getter(#m),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
         '''), dedent2('''
         set m(int? _m) => super.noSuchMethod(
@@ -2113,7 +2111,7 @@ void main() {
       _containsAllOf(dedent2('''
         int get m => (super.noSuchMethod(
               Invocation.getter(#m),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
       ''')),
     );
@@ -2159,7 +2157,7 @@ void main() {
                 #+,
                 [other],
               ),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
       ''')),
     );
@@ -2178,7 +2176,7 @@ void main() {
                 #[],
                 [x],
               ),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
       ''')),
     );
@@ -2197,112 +2195,57 @@ void main() {
                 #~,
                 [],
               ),
-              returnValue: 0,
+              dummy: _i3.DummyFor<int>(),
             ) as int);
       ''')),
     );
   });
 
-  test('creates dummy non-null bool return value', () async {
+  test('passes dummy non-null simply typed return value', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
       class Foo {
         bool m() => false;
       }
       '''),
-      _containsAllOf('returnValue: false,'),
+      _containsAllOf('dummy: _i3.DummyFor<bool>()'),
     );
   });
 
-  test('creates dummy non-null double return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        double m() => 3.14;
-      }
-      '''),
-      _containsAllOf('returnValue: 0.0,'),
-    );
-  });
-
-  test('creates dummy non-null int return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        int m() => 7;
-      }
-      '''),
-      _containsAllOf('returnValue: 0,'),
-    );
-  });
-
-  test('creates dummy non-null String return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        String m() => "Hello";
-      }
-      '''),
-      _containsAllOf("returnValue: '',"),
-    );
-  });
-
-  test('creates dummy non-null List return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        List<Foo> m() => [Foo()];
-      }
-      '''),
-      _containsAllOf('returnValue: <_i2.Foo>[],'),
-    );
-  });
-
-  test('creates dummy non-null Set return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        Set<Foo> m() => {Foo()};
-      }
-      '''),
-      _containsAllOf('returnValue: <_i2.Foo>{},'),
-    );
-  });
-
-  test('creates dummy non-null Map return value', () async {
+  test('passes dummy non-null generic return value', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
       class Foo {
         Map<int, Foo> m() => {7: Foo()};
       }
       '''),
-      _containsAllOf('returnValue: <int, _i2.Foo>{},'),
+      _containsAllOf('dummy: _i3.DummyFor<Map<int, _i2.Foo>>()'),
     );
   });
 
-  test('creates dummy non-null raw-typed return value', () async {
+  test('passes dummy non-null raw-typed return value', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
       abstract class Foo {
         Map m();
       }
       '''),
-      _containsAllOf('returnValue: <dynamic, dynamic>{},'),
+      _containsAllOf('dummy: _i3.DummyFor<Map<dynamic, dynamic>>()'),
     );
   });
 
-  test('creates dummy non-null return values for Futures', () async {
+  test('passes dummy non-null return values for Futures', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
       class Foo {
         Future<bool> m() async => false;
       }
       '''),
-      _containsAllOf('returnValue: _i3.Future<bool>.value(false),'),
+      _containsAllOf('dummy: _i4.DummyForFuture<bool>()'),
     );
   });
 
-  test('creates dummy non-null return values for Futures of unknown types',
+  test('passes dummy non-null return values for Futures of unknown types',
       () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
@@ -2310,18 +2253,7 @@ void main() {
         Future<T> m<T>() async => false;
       }
       '''),
-      _containsAllOf('returnValue: _FakeFuture_0<T>('),
-    );
-  });
-
-  test('creates dummy non-null Stream return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      abstract class Foo {
-        Stream<int> m();
-      }
-      '''),
-      _containsAllOf('returnValue: _i3.Stream<int>.empty(),'),
+      _containsAllOf('dummy: _i4.DummyForFuture<T>()'),
     );
   });
 
@@ -2336,14 +2268,15 @@ void main() {
         Bar(this.name);
       }
       '''),
-      _containsAllOf('''
-        returnValue: _FakeBar_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),'''),
+      _containsAllOf('dummy: _i3.DummyFor<_i2.Bar>()', '''
+    _i1.provideDummyBuilder<_i2.Bar>((
+      Object parent,
+      Invocation invocation,
+    ) =>
+        _FakeBar_0(
+          parent,
+          invocation,
+        ));'''),
     );
   });
 
@@ -2355,14 +2288,15 @@ void main() {
       }
       class Bar<T> {}
       '''),
-      _containsAllOf('''
-        returnValue: _FakeBar_0<int>(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),'''),
+      _containsAllOf('dummy: _i3.DummyFor<_i2.Bar<int>>()', '''
+    _i1.provideDummyBuilder<_i2.Bar<int>>((
+      Object parent,
+      Invocation invocation,
+    ) =>
+        _FakeBar_0<int>(
+          parent,
+          invocation,
+        ));'''),
     );
   });
 
@@ -2377,24 +2311,7 @@ void main() {
         two,
       }
       '''),
-      _containsAllOf('returnValue: _i2.Bar.one,'),
-    );
-  });
-
-  test(
-      'creates a dummy non-null function-typed return value, with optional '
-      'parameters', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        void Function(int, [String]) m() => (int i, [String s]) {};
-      }
-      '''),
-      _containsAllOf('''
-        returnValue: (
-          int __p0, [
-          String __p1,
-        ]) {},'''),
+      _containsAllOf('_i2.Bar.one'),
     );
   });
 
@@ -2408,10 +2325,11 @@ void main() {
       }
       '''),
       _containsAllOf('''
-        returnValue: (
-          _i2.Foo __p0, {
-          bool b,
-        }) {},'''),
+      return (
+        _i2.Foo __p0, {
+        bool b,
+      }) =>
+          throw _i4.FakeFunctionUsedError('''),
     );
   });
 
@@ -2425,30 +2343,11 @@ void main() {
       }
       '''),
       _containsAllOf('''
-        returnValue: (
-          _i2.Foo __p0, {
-          required bool b,
-        }) {},'''),
-    );
-  });
-
-  test(
-      'creates a dummy non-null function-typed return value, with non-core '
-      'return type', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      class Foo {
-        Foo Function() m() => () => Foo();
-      }
-      '''),
-      _containsAllOf('''
-        returnValue: () => _FakeFoo_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),'''),
+      return (
+        _i2.Foo __p0, {
+        required bool b,
+      }) =>
+          throw _i4.FakeFunctionUsedError('''),
     );
   });
 
@@ -2457,20 +2356,13 @@ void main() {
       'alias', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
-      typedef _Callback = Foo Function();
+      typedef _Callback = Foo Function({required int i});
       class Foo {
-        _Callback m() => () => Foo();
+        _Callback m() => ({required int i}) => Foo();
       }
       '''),
-      _containsAllOf('''
-        returnValue: () => _FakeFoo_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),
-      '''),
+      _containsAllOf(
+          'return ({required int i}) => throw _i4.FakeFunctionUsedError('),
     );
   });
 
@@ -2482,7 +2374,7 @@ void main() {
         T? Function<T>(T) m() => (int i, [String s]) {};
       }
       '''),
-      _containsAllOf('returnValue: <T>(T __p0) => null,'),
+      _containsAllOf('return <T>(T __p0) => throw _i4.FakeFunctionUsedError('),
     );
   });
 
@@ -2495,15 +2387,9 @@ void main() {
         T? Function<T extends File>(T) m() => (int i, [String s]) {};
       }
       '''),
-      _containsAllOf(dedent2('''
-      T? Function<T extends _i3.File>(T) m() => (super.noSuchMethod(
-            Invocation.method(
-              #m,
-              [],
-            ),
-            returnValue: <T extends _i3.File>(T __p0) => null,
-          ) as T? Function<T extends _i3.File>(T));
-      ''')),
+      _containsAllOf(
+        'return <T extends _i3.File>(T __p0) => throw _i5.FakeFunctionUsedError(',
+      ),
     );
   });
 
@@ -2511,50 +2397,14 @@ void main() {
       'creates a dummy non-null function-typed (with an imported parameter '
       'type) return value', () async {
     await expectSingleNonNullableOutput(
-      dedent(r'''
+        dedent(r'''
       import 'dart:io';
       class Foo {
-        void Function(File) m() => (int i, [String s]) {};
+        void Function({required File file}) m() => (int i, [String s]) {};
       }
       '''),
-      _containsAllOf(dedent2('''
-      void Function(_i3.File) m() => (super.noSuchMethod(
-            Invocation.method(
-              #m,
-              [],
-            ),
-            returnValue: (_i3.File __p0) {},
-          ) as void Function(_i3.File));
-      ''')),
-    );
-  });
-
-  test(
-      'creates a dummy non-null function-typed (with an imported return type) '
-      'return value', () async {
-    await expectSingleNonNullableOutput(
-      dedent(r'''
-      import 'dart:io';
-      class Foo {
-        File Function() m() => (int i, [String s]) {};
-      }
-      '''),
-      _containsAllOf(dedent2('''
-      _i2.File Function() m() => (super.noSuchMethod(
-            Invocation.method(
-              #m,
-              [],
-            ),
-            returnValue: () => _FakeFile_0(
-              this,
-              Invocation.method(
-                #m,
-                [],
-              ),
-            ),
-          ) as _i2.File Function());
-      ''')),
-    );
+        _containsAllOf(
+            'return ({required _i3.File file}) => throw _i5.FakeFunctionUsedError('));
   });
 
   test('generates a fake class used in return values', () async {
@@ -3395,6 +3245,7 @@ void main() {
         'foo|test/foo_test.mocks.dart': _containsAllOf(dedent('''
         class MockFoo extends _i1.Mock implements _i2.Foo {
           MockFoo() {
+            _Initialize.dummies();
             _i1.throwOnMissingStub(this);
           }
         }

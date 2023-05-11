@@ -86,6 +86,7 @@ void main() {}
 
 const _constructorWithThrowOnMissingStub = '''
 MockFoo() {
+    _Initialize.dummies();
     _i1.throwOnMissingStub(this);
   }''';
 
@@ -668,8 +669,8 @@ void main() {
         void main() {}
         '''
     });
-    expect(mocksContent, contains('returnValue: 0,'));
-    expect(mocksContent, contains('returnValueForMissingStub: 0,'));
+    expect(mocksContent, contains('dummy: _i3.DummyFor<int>(),'));
+    expect(mocksContent, contains('returnValueForMissingStub: null,'));
   });
 
   test(
@@ -696,8 +697,8 @@ void main() {
         void main() {}
         '''
     });
-    expect(mocksContent, contains('returnValue: 0,'));
-    expect(mocksContent, contains('returnValueForMissingStub: 0,'));
+    expect(mocksContent, contains('dummy: _i3.DummyFor<int>(),'));
+    expect(mocksContent, contains('returnValueForMissingStub: null,'));
   });
 
   test(
@@ -724,21 +725,13 @@ void main() {
         void main() {}
         '''
     });
-    expect(mocksContent, contains('''
-        returnValue: _FakeBar_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),
-        returnValueForMissingStub: _FakeBar_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),'''));
+    expect(mocksContent, contains('dummy: _i3.DummyFor<_i2.Bar>(),'));
+    expect(mocksContent, contains('returnValueForMissingStub: null,'));
+    expect(mocksContent, contains('''=>
+        _FakeBar_0(
+          parent,
+          invocation,
+        ));'''));
   });
 
   test('generates mock classes including a fallback generator for a getter',
@@ -1394,8 +1387,8 @@ void main() {
         '''
     });
     expect(mocksContent, isNot(contains('throwOnMissingStub')));
-    expect(mocksContent, contains('returnValue: 0'));
-    expect(mocksContent, contains('returnValueForMissingStub: 0'));
+    expect(mocksContent, contains('dummy: _i3.DummyFor<int>()'));
+    expect(mocksContent, contains('returnValueForMissingStub: null'));
   });
 
   test(
@@ -1819,7 +1812,7 @@ void main() {
             void main() {}
           '''
     });
-    expect(mocksContent, contains('returnValue: <T1>(T1 __p0) => <T>[]'));
+    expect(mocksContent, contains('return <T1>(T1 __p0) => throw'));
   });
   // Here rename in not needed, but the code does it.
   test('We rename obscure type variables', () async {

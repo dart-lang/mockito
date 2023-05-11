@@ -113,6 +113,7 @@ class MockBuilder implements Builder {
       b.body.add(Code('// ignore_for_file: subtype_of_sealed_class\n\n'));
       b.body.addAll(mockLibraryInfo.fakeClasses);
       b.body.addAll(mockLibraryInfo.mockClasses);
+      b.body.add(mockLibraryInfo.initializerClass);
     });
 
     final emitter = DartEmitter(
@@ -1040,6 +1041,9 @@ class _MockLibraryInfo {
   /// values.
   final fakeClasses = <Class>[];
 
+  /// Dummy builders by type.
+  final dummyBuilders = <analyzer.DartType, Code>{};
+
   /// [InterfaceElement]s which are used in non-nullable return types, for which
   /// fake classes are added to the generated library.
   final fakedInterfaceElements = <InterfaceElement>[];
@@ -1058,6 +1062,24 @@ class _MockLibraryInfo {
   ///
   /// Each of these must be imported with a prefix to avoid the conflict.
   final coreConflicts = <String>{};
+
+  /// Initalizer class.
+  Class get initializerClass => Class((c) => c
+    ..name = '_Initialize'
+    ..fields.add(Field((f) => f
+      ..name = '_initialized'
+      ..type = refer('bool')
+      ..static = true
+      ..assignment = literalBool(false).code))
+    ..methods.add(Method((m) => m
+      ..name = 'dummies'
+      ..static = true
+      ..returns = refer('void')
+      ..body = Block.of([
+        Code('if (_initialized) return;'),
+        ...dummyBuilders.values,
+        refer('_initialized').assign(literalBool(true)).statement
+      ]))));
 
   /// Build mock classes for [mockTargets].
   _MockLibraryInfo(
@@ -1173,9 +1195,8 @@ class _MockClassInfo {
                 ? typeArguments.map(_typeReference)
                 : typeParams);
         }));
-        if (mockTarget.onMissingStub == OnMissingStub.throwException) {
-          cBuilder.constructors.add(_constructorWithThrowOnMissingStub);
-        }
+        cBuilder.constructors.add(_constructor(
+            mockTarget.onMissingStub == OnMissingStub.throwException));
 
         final substitution = Substitution.fromPairs([
           ...classToMock.typeParameters,
@@ -1303,10 +1324,14 @@ class _MockClassInfo {
   /// The default behavior of mocks is to return null for unstubbed methods. To
   /// use the new behavior of throwing an error, we must explicitly call
   /// `throwOnMissingStub`.
-  Constructor get _constructorWithThrowOnMissingStub =>
-      Constructor((cBuilder) => cBuilder.body =
-          referImported('throwOnMissingStub', 'package:mockito/mockito.dart')
-              .call([refer('this').expression]).statement);
+  Constructor _constructor(bool throwOnMissingStub) =>
+      Constructor((cBuilder) => cBuilder.body = Block.of([
+            refer('_Initialize.dummies').call([]).statement,
+            if (throwOnMissingStub)
+              referImported(
+                      'throwOnMissingStub', 'package:mockito/mockito.dart')
+                  .call([refer('this').expression]).statement
+          ]));
 
   /// Build a method which overrides [method], with all non-nullable
   /// parameter types widened to be nullable.
@@ -1408,40 +1433,54 @@ class _MockClassInfo {
         if (invocationNamedArgs.isNotEmpty) literalMap(invocationNamedArgs),
       ]);
 
-      Expression? returnValueForMissingStub;
-      if (returnType.isVoid) {
-        returnValueForMissingStub = refer('null');
-      } else if (returnType.isFutureOfVoid) {
-        returnValueForMissingStub =
-            _futureReference(refer('void')).property('value').call([]);
-      } else if (mockTarget.onMissingStub == OnMissingStub.returnDefault) {
-        if (fallbackGenerator != null) {
-          // Re-use the fallback for missing stub.
-          returnValueForMissingStub =
-              _fallbackGeneratorCode(method, fallbackGenerator);
-        } else {
-          // Return a legal default value if no stub is found which matches a real
-          // call.
-          returnValueForMissingStub = _dummyValue(returnType, invocation);
-        }
-      }
-      final namedArgs = {
-        if (fallbackGenerator != null)
-          'returnValue': _fallbackGeneratorCode(method, fallbackGenerator)
-        else if (typeSystem._returnTypeIsNonNullable(method))
-          'returnValue': _dummyValue(returnType, invocation),
-        if (returnValueForMissingStub != null)
-          'returnValueForMissingStub': returnValueForMissingStub,
-      };
-
-      var superNoSuchMethod =
-          refer('super').property('noSuchMethod').call([invocation], namedArgs);
+      var superNoSuchMethod = refer('super').property('noSuchMethod').call(
+          [invocation],
+          _namedArgs(
+              returnType,
+              fallbackGenerator != null
+                  ? _fallbackGeneratorCode(method, fallbackGenerator)
+                  : null,
+              invocation));
       if (!returnType.isVoid && !returnType.isDynamic) {
         superNoSuchMethod = superNoSuchMethod.asA(_typeReference(returnType));
       }
 
       builder.body = superNoSuchMethod.code;
     });
+  }
+
+  Map<String, Expression> _namedArgs(analyzer.DartType returnType,
+      Expression? fallbackGeneratorCode, Expression invocation) {
+    Expression? returnValueForMissingStub;
+    if (returnType.isVoid) {
+      returnValueForMissingStub = refer('null');
+    } else if (returnType.isFutureOfVoid) {
+      returnValueForMissingStub =
+          _futureReference(refer('void')).property('value').call([]);
+    } else if (mockTarget.onMissingStub == OnMissingStub.returnDefault) {
+      if (fallbackGeneratorCode != null) {
+        // Re-use the fallback for missing stub.
+        returnValueForMissingStub = fallbackGeneratorCode;
+      } else {
+        returnValueForMissingStub = refer('null');
+      }
+    }
+    var dummyType = returnType;
+    if (returnType.isDartAsyncFuture || returnType.isDartAsyncFutureOr) {
+      dummyType = (returnType as analyzer.InterfaceType).typeArguments.single;
+    }
+    // just to create fake classes.
+    _addDummies(dummyType);
+    final dummy = referImported(
+            returnType.isDartAsyncFuture ? 'DummyForFuture' : 'DummyFor',
+            'package:mockito/src/dummies.dart')
+        .call([], {}, [_typeReference(dummyType)]);
+    return {
+      if (fallbackGeneratorCode != null) 'returnValue': fallbackGeneratorCode,
+      if (returnValueForMissingStub != null)
+        'returnValueForMissingStub': returnValueForMissingStub,
+      'dummy': dummy,
+    };
   }
 
   Expression _fallbackGeneratorCode(
@@ -1463,90 +1502,41 @@ class _MockClassInfo {
     ]);
   }
 
-  Expression _dummyValue(analyzer.DartType type, Expression invocation) {
-    // The type is nullable, just take a shortcut and return `null`.
+  void _addDummies(analyzer.DartType type) {
     if (typeSystem.isNullable(type)) {
-      return literalNull;
+      return;
     }
 
     if (type is analyzer.FunctionType) {
-      return _dummyFunctionValue(type, invocation);
+      if (type.typeFormals.isEmpty &&
+          type.namedParameterTypes.isEmpty &&
+          type.parameters.length <= 20) return;
+      _provideDummyBuilder(type, () => _dummyFunctionValueBuilder(type));
+      return;
     }
 
-    if (type is! analyzer.InterfaceType) {
-      // TODO(srawlins): This case is not known.
-      return literalNull;
-    }
+    if (type is! analyzer.InterfaceType) return;
 
-    final typeArguments = type.typeArguments;
-    if (type.isDartCoreBool) {
-      return literalFalse;
-    } else if (type.isDartCoreDouble) {
-      return literalNum(0.0);
-    } else if (type.isDartCoreFunction) {
-      return refer('() {}');
-    } else if (type.isDartAsyncFuture || type.isDartAsyncFutureOr) {
-      final typeArgument = typeArguments.first;
-      final typeArgumentIsPotentiallyNonNullable =
-          typeSystem.isPotentiallyNonNullable(typeArgument);
-      if (typeArgument is analyzer.TypeParameterType &&
-          typeArgumentIsPotentiallyNonNullable) {
-        // We cannot create a valid Future for this unknown, potentially
-        // non-nullable type, so we'll use a `_FakeFuture`, which will throw
-        // if awaited.
-        final futureType = typeProvider.futureType(typeArguments.first);
-        return _dummyValueImplementing(futureType, invocation);
-      } else {
-        // Create a real Future with a legal value, via [Future.value].
-        final futureValueArguments = typeArgumentIsPotentiallyNonNullable
-            ? [_dummyValue(typeArgument, invocation)]
-            : <Expression>[];
-        return _futureReference(_typeReference(typeArgument))
-            .property('value')
-            .call(futureValueArguments);
-      }
-    } else if (type.isDartCoreInt) {
-      return literalNum(0);
-    } else if (type.isDartCoreIterable || type.isDartCoreList) {
-      assert(typeArguments.length == 1);
-      final elementType = _typeReference(typeArguments[0]);
-      return literalList([], elementType);
-    } else if (type.isDartCoreMap) {
-      assert(typeArguments.length == 2);
-      final keyType = _typeReference(typeArguments[0]);
-      final valueType = _typeReference(typeArguments[1]);
-      return literalMap({}, keyType, valueType);
-    } else if (type.isDartCoreNum) {
-      return literalNum(0);
-    } else if (type.isDartCoreSet) {
-      assert(typeArguments.length == 1);
-      final elementType = _typeReference(typeArguments[0]);
-      return literalSet({}, elementType);
-    } else if (type.element.declaration == typeProvider.streamElement) {
-      assert(typeArguments.length == 1);
-      final elementType = _typeReference(typeArguments[0]);
-      return TypeReference((b) {
-        b
-          ..symbol = 'Stream'
-          ..url = 'dart:async'
-          ..types.add(elementType);
-      }).property('empty').call([]);
-    } else if (type.isDartCoreString) {
-      return literalString('');
-    } else if (type.isDartTypedDataSealed) {
-      // These types (XXXList + ByteData) from dart:typed_data are
-      // sealed, e.g. "non-subtypeable", but they
-      // have predicatble constructors; each has an unnamed constructor which
-      // takes a single int argument.
-      return referImported(type.element.name, 'dart:typed_data')
-          .call([literalNum(0)]);
-      // TODO(srawlins): Do other types from typed_data have a "non-subtypeable"
-      // restriction as well?
+    // For Futures we might need to add a dummy for the type argument.
+    if (type.isDartAsyncFuture || type.isDartAsyncFutureOr) {
+      final typeArgument = type.typeArguments.first;
+      _addDummies(typeArgument);
+      return;
     }
+    // Core types are covered in dummies.dart.
+    if (type.isDartCoreFunction) return;
+    if (type.isDartCoreBool) return;
+    if (type.isDartCoreInt) return;
+    if (type.isDartCoreIterable || type.isDartCoreList) return;
+    if (type.isDartCoreMap) return;
+    if (type.isDartCoreNum) return;
+    if (type.isDartCoreSet) return;
+    if (type.element.declaration == typeProvider.streamElement) return;
+    if (type.isDartCoreString) return;
+    if (type.isDartTypedDataSealed) return;
 
-    // This class is unknown; we must likely generate a fake class, and return
-    // an instance here.
-    return _dummyValueImplementing(type, invocation);
+    // This class is unknown; we must likely generate a fake class.
+    _provideDummyBuilder(type, () => _dummyValueImplementing(type));
   }
 
   /// Returns a reference to [Future], optionally with a type argument for the
@@ -1560,66 +1550,95 @@ class _MockClassInfo {
         }
       });
 
-  Expression _dummyFunctionValue(
-      analyzer.FunctionType type, Expression invocation) {
-    return Method((b) {
-      _withTypeParameters(type.typeFormals, (typeParamsWithBounds, _) {
-        b.types.addAll(typeParamsWithBounds);
-        // The positional parameters in a FunctionType have no names. This
-        // counter lets us create unique dummy names.
-        var position = 0;
-        for (final parameter in type.parameters) {
-          if (parameter.isRequiredPositional) {
-            final matchingParameter = _matchingParameter(parameter,
-                superParameterType: parameter.type,
-                defaultName: '__p$position');
-            b.requiredParameters.add(matchingParameter);
-            position++;
-          } else if (parameter.isOptionalPositional) {
-            final matchingParameter = _matchingParameter(parameter,
-                superParameterType: parameter.type,
-                defaultName: '__p$position');
-            b.optionalParameters.add(matchingParameter);
-            position++;
-          } else if (parameter.isOptionalNamed) {
-            final matchingParameter = _matchingParameter(parameter,
-                superParameterType: parameter.type);
-            b.optionalParameters.add(matchingParameter);
-          } else if (parameter.isRequiredNamed) {
-            final matchingParameter = _matchingParameter(parameter,
-                superParameterType: parameter.type);
-            b.optionalParameters.add(matchingParameter);
-          }
-        }
-        if (type.returnType.isVoid) {
-          b.body = Code('');
-        } else {
-          b.body = _dummyValue(type.returnType, invocation).code;
-        }
-      });
-    }).genericClosure;
+  void _provideDummyBuilder(
+      analyzer.DartType type, Expression Function() builder) {
+    if (mockLibraryInfo.dummyBuilders.containsKey(type)) return;
+    mockLibraryInfo.dummyBuilders[type] =
+        referImported('provideDummyBuilder', 'package:mockito/mockito.dart')
+            .call([builder()], {}, [_typeReference(type)]).statement;
   }
 
-  Expression _dummyValueImplementing(
-      analyzer.InterfaceType dartType, Expression invocation) {
-    final elementToFake = dartType.element;
-    if (elementToFake is EnumElement) {
-      return _typeReference(dartType).property(
-          elementToFake.fields.firstWhere((f) => f.isEnumConstant).name);
-    } else {
-      final fakeName = mockLibraryInfo._fakeNameFor(elementToFake);
-      // Only make one fake class for each class that needs to be faked.
-      if (!mockLibraryInfo.fakedInterfaceElements.contains(elementToFake)) {
-        _addFakeClass(fakeName, elementToFake);
-      }
-      final typeArguments = dartType.typeArguments;
-      return TypeReference((b) {
-        b
-          ..symbol = fakeName
-          ..types.addAll(typeArguments.map(_typeReference));
-      }).newInstance([refer('this'), invocation]);
-    }
-  }
+  Expression _dummyValueBuilder(
+          Code Function(Reference parent, Reference invocation) body) =>
+      Method((m) => m
+        ..requiredParameters.addAll([
+          Parameter((p) => p
+            ..type = refer('Object')
+            ..name = 'parent'),
+          Parameter((p) => p
+            ..type = refer('Invocation')
+            ..name = 'invocation')
+        ])
+        ..body = body(refer('parent'), refer('invocation'))).closure;
+
+  Expression _dummyFunctionValueBuilder(analyzer.FunctionType type) =>
+      _dummyValueBuilder((parent, invocation) => Block.of([
+            declareFinal('stackTrace')
+                .assign(refer('StackTrace').property('current'))
+                .statement,
+            Method((b) => _withTypeParameters(type.typeFormals,
+                    (typeParamsWithBounds, _) {
+                  b.types.addAll(typeParamsWithBounds);
+                  // The positional parameters in a FunctionType have no names. This
+                  // counter lets us create unique dummy names.
+                  var position = 0;
+                  for (final parameter in type.parameters) {
+                    if (parameter.isRequiredPositional) {
+                      final matchingParameter = _matchingParameter(parameter,
+                          superParameterType: parameter.type,
+                          defaultName: '__p$position');
+                      b.requiredParameters.add(matchingParameter);
+                      position++;
+                    } else if (parameter.isOptionalPositional) {
+                      final matchingParameter = _matchingParameter(parameter,
+                          superParameterType: parameter.type,
+                          defaultName: '__p$position');
+                      b.optionalParameters.add(matchingParameter);
+                      position++;
+                    } else if (parameter.isOptionalNamed) {
+                      final matchingParameter = _matchingParameter(parameter,
+                          superParameterType: parameter.type);
+                      b.optionalParameters.add(matchingParameter);
+                    } else if (parameter.isRequiredNamed) {
+                      final matchingParameter = _matchingParameter(parameter,
+                          superParameterType: parameter.type);
+                      b.optionalParameters.add(matchingParameter);
+                    }
+                  }
+                  b.body = referImported('FakeFunctionUsedError',
+                          'package:mockito/src/mock.dart')
+                      .newInstance([
+                        invocation,
+                        parent,
+                        refer('stackTrace'),
+                      ])
+                      .thrown
+                      .code;
+                })).genericClosure.returned.statement
+          ]));
+
+  Expression _dummyValueImplementing(analyzer.InterfaceType dartType) =>
+      _dummyValueBuilder((parent, invocation) {
+        final elementToFake = dartType.element;
+        if (elementToFake is EnumElement) {
+          return _typeReference(dartType)
+              .property(
+                  elementToFake.fields.firstWhere((f) => f.isEnumConstant).name)
+              .code;
+        } else {
+          final fakeName = mockLibraryInfo._fakeNameFor(elementToFake);
+          // Only make one fake class for each class that needs to be faked.
+          if (!mockLibraryInfo.fakedInterfaceElements.contains(elementToFake)) {
+            _addFakeClass(fakeName, elementToFake);
+          }
+          final typeArguments = dartType.typeArguments;
+          return TypeReference((b) {
+            b
+              ..symbol = fakeName
+              ..types.addAll(typeArguments.map(_typeReference));
+          }).newInstance([parent, invocation]).code;
+        }
+      });
 
   /// Adds a `Fake` implementation of [elementToFake], named [fakeName].
   void _addFakeClass(String fakeName, InterfaceElement elementToFake) {
@@ -1906,16 +1925,12 @@ class _MockClassInfo {
         referImported('Invocation', 'dart:core').property('getter').call([
       refer('#${getter.displayName}'),
     ]);
-    final namedArgs = {
-      if (fallbackGenerator != null)
-        'returnValue': _fallbackGeneratorCode(getter, fallbackGenerator)
-      else if (typeSystem._returnTypeIsNonNullable(getter))
-        'returnValue': _dummyValue(returnType, invocation),
-      if (mockTarget.onMissingStub == OnMissingStub.returnDefault)
-        'returnValueForMissingStub': (fallbackGenerator != null
+    final namedArgs = _namedArgs(
+        returnType,
+        fallbackGenerator != null
             ? _fallbackGeneratorCode(getter, fallbackGenerator)
-            : _dummyValue(returnType, invocation)),
-    };
+            : null,
+        invocation);
     var superNoSuchMethod =
         refer('super').property('noSuchMethod').call([invocation], namedArgs);
     if (!returnType.isVoid && !returnType.isDynamic) {
@@ -2123,17 +2138,16 @@ class _MockClassInfo {
     return mockLibraryInfo.assetUris[element] ??
         (throw StateError('Asset URI is missing for $element'));
   }
-
-  /// Returns a [Reference] to [symbol] with [url].
-  ///
-  /// This function overrides `code_builder.refer` so as to ensure that [url] is
-  /// given.
-  static Reference referImported(String symbol, String? url) =>
-      Reference(symbol, url);
-
-  /// Returns a [Reference] to [symbol] with no URL.
-  static Reference refer(String symbol) => Reference(symbol);
 }
+
+/// Returns a [Reference] to [symbol] with [url].
+///
+/// This function overrides `code_builder.refer` so as to ensure that [url] is
+/// given.
+Reference referImported(String symbol, String? url) => Reference(symbol, url);
+
+/// Returns a [Reference] to [symbol] with no URL.
+Reference refer(String symbol) => Reference(symbol);
 
 /// An exception thrown when reviving a potentially deep value in a constant.
 ///
