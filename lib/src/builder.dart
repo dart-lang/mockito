@@ -1380,15 +1380,7 @@ class _MockClassInfo {
               returnType.containsPrivateName ||
               parametersContainPrivateName);
 
-      if (throwsUnsupported) {
-        if (!mockTarget.unsupportedMembers.contains(name)) {
-          // We shouldn't get here as this is guarded against in
-          // [_MockTargetGatherer._checkFunction].
-          throw InvalidMockitoAnnotationException(
-              "Mockito cannot generate a valid override for '$name', as it has a "
-              'non-nullable unknown return type or a private type in its '
-              'signature.');
-        }
+      if (mockTarget.unsupportedMembers.contains(name)) {
         builder.body = refer('UnsupportedError')
             .call([
               // Generate a raw string since name might contain a $.
@@ -1399,6 +1391,14 @@ class _MockClassInfo {
             .thrown
             .code;
         return;
+      }
+      if (throwsUnsupported) {
+        // We shouldn't get here as this is guarded against in
+        // [_MockTargetGatherer._checkFunction].
+        throw InvalidMockitoAnnotationException(
+            "Mockito cannot generate a valid override for '$name', as it has a "
+            'non-nullable unknown return type or a private type in its '
+            'signature.');
       }
 
       final invocation =
@@ -1881,14 +1881,7 @@ class _MockClassInfo {
             returnType is analyzer.TypeParameterType;
     final throwsUnsupported = fallbackGenerator == null &&
         (returnTypeIsTypeVariable || getter.returnType.containsPrivateName);
-    if (throwsUnsupported) {
-      if (!mockTarget.unsupportedMembers.contains(getter.name)) {
-        // We shouldn't get here as this is guarded against in
-        // [_MockTargetGatherer._checkFunction].
-        throw InvalidMockitoAnnotationException(
-            "Mockito cannot generate a valid override for '${getter.name}', as "
-            'it has a non-nullable unknown type or a private type.');
-      }
+    if (mockTarget.unsupportedMembers.contains(getter.name)) {
       builder.body = refer('UnsupportedError')
           .call([
             // Generate a raw string since getter.name might contain a $.
@@ -1900,6 +1893,13 @@ class _MockClassInfo {
           .thrown
           .code;
       return;
+    }
+    if (throwsUnsupported) {
+      // We shouldn't get here as this is guarded against in
+      // [_MockTargetGatherer._checkFunction].
+      throw InvalidMockitoAnnotationException(
+          "Mockito cannot generate a valid override for '${getter.name}', as "
+          'it has a non-nullable unknown type or a private type.');
     }
 
     final invocation =
