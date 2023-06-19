@@ -2051,7 +2051,20 @@ class _MockClassInfo {
 
   T _withTypeParameters<T>(Iterable<TypeParameterElement> typeParameters,
       T Function(Iterable<TypeReference>, Iterable<TypeReference>) body) {
-    final typeVars = {for (final t in typeParameters) t: _newTypeVar(t)};
+    final Map<TypeParameterElement, String> typeVars = {};
+    for (final t in typeParameters) {
+      final typeVar = _newTypeVar(t);
+      typeVars[t] = typeVar;
+      final bound = t.bound;
+      if (bound != null && bound is analyzer.InterfaceType) {
+        for (final type in bound.typeArguments) {
+          final element = type.element;
+          if (element != null && element is TypeParameterElement) {
+            typeVars[element] = typeVar;
+          }
+        }
+      }
+    }
     _typeVariableScopes.add(typeVars);
     final typeRefsWithBounds = typeParameters.map(_typeParameterReference);
     final typeRefs =

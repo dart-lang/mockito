@@ -1,3 +1,7 @@
+## 5.4.3
+
+* Fixed the bug with code generation on nested generic bounded type arguments. [#658](https://github.com/dart-lang/mockito/issues/658) 
+
 ## 5.4.2
 
 * Require code_builder 4.5.0.
