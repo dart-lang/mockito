@@ -62,3 +62,8 @@ mixin HasPrivateMixin implements HasPrivate {
   @override
   Object? _p;
 }
+
+class WidensOperatorEq {
+  @override
+  bool operator ==(dynamic other) => identical(this, other);
+}

@@ -9,7 +9,8 @@ import 'generated_mocks_test.mocks.dart';
 @GenerateMocks([
   Foo,
   FooSub,
-  Bar
+  Bar,
+  WidensOperatorEq
 ], customMocks: [
   MockSpec<Foo>(
     as: #MockFooWithDefaults,

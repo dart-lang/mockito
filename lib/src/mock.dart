@@ -194,8 +194,12 @@ mixin class Mock {
   @override
   int get hashCode => _givenHashCode ?? 0;
 
+  // Override [Object.operator==] to accept `Object?`. This is needed to
+  // make things compile, if we mock classes that override `==` to
+  // accept `Object?` or `dynamic`.
   @override
-  bool operator ==(other) => (_givenHashCode != null && other is Mock)
+  // ignore: non_nullable_equals_parameter
+  bool operator ==(Object? other) => (_givenHashCode != null && other is Mock)
       ? _givenHashCode == other._givenHashCode
       : identical(this, other);
 
