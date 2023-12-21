@@ -575,7 +575,7 @@ class _MockTargetGatherer {
       List<ast.CollectionElement> mockSpecAsts,
       {bool nice = false}) {
     // need to get the parent until type name is not MockSpec to allow inheritance
-    while(mockSpec.type?.element?.name != "MockSpec") {
+    while (mockSpec.type?.element?.name != "MockSpec") {
       mockSpec = mockSpec.getField("(super)")!;
     }
 
@@ -686,10 +686,10 @@ class _MockTargetGatherer {
       throw InvalidMockitoAnnotationException(
           'The GenerateNiceMocks "mockSpecs" argument is missing');
     }
-    final mockSpecAsts = _niceMocksAst(annotation.annotationAst).elements.toList();
+    final mockSpecAsts =
+        _niceMocksAst(annotation.annotationAst).elements.toList();
     return mockSpecsField.toListValue()!.mapIndexed((index, mockSpec) =>
-        _mockTargetFromMockSpec(
-            mockSpec, entryLib, index, mockSpecAsts,
+        _mockTargetFromMockSpec(mockSpec, entryLib, index, mockSpecAsts,
             nice: true));
   }
 
