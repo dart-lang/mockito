@@ -11,3 +11,6 @@ coverage/
 
 # ignore generated mocks
 **/*.mocks.dart
+
+# ide folders
+.idea

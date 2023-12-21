@@ -574,6 +574,11 @@ class _MockTargetGatherer {
       int index,
       List<ast.CollectionElement> mockSpecAsts,
       {bool nice = false}) {
+    // need to get the parent until type name is not MockSpec to allow inheritance
+    while (mockSpec.type?.element?.name != "MockSpec") {
+      mockSpec = mockSpec.getField("(super)")!;
+    }
+
     final mockSpecType = mockSpec.type as analyzer.InterfaceType;
     assert(mockSpecType.typeArguments.length == 1);
     final mockType = _mockType(mockSpecAsts[index]);
@@ -681,10 +686,10 @@ class _MockTargetGatherer {
       throw InvalidMockitoAnnotationException(
           'The GenerateNiceMocks "mockSpecs" argument is missing');
     }
-    final mockSpecAsts = _niceMocksAst(annotation.annotationAst).elements;
+    final mockSpecAsts =
+        _niceMocksAst(annotation.annotationAst).elements.toList();
     return mockSpecsField.toListValue()!.mapIndexed((index, mockSpec) =>
-        _mockTargetFromMockSpec(
-            mockSpec, entryLib, index, mockSpecAsts.toList(),
+        _mockTargetFromMockSpec(mockSpec, entryLib, index, mockSpecAsts,
             nice: true));
   }
 

@@ -1,3 +1,7 @@
+## 5.4.5-wip
+
+* Allow usage of GetMock superclasses.
+
 ## 5.4.4
 
 * Use `posix` style for local imports.
