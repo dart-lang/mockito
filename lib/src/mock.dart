@@ -968,7 +968,6 @@ class VerificationResult {
   @Deprecated(
       'captured should be considered final - assigning this field may be '
       'removed as early as Mockito 5.0.0')
-  // ignore: unnecessary_getters_setters
   set captured(List<dynamic> captured) => _captured = captured;
 
   /// The number of calls matched in this verification.
