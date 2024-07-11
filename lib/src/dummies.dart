@@ -134,7 +134,7 @@ List<Object?> _defaultDummies = [
   <Never>[],
   <Never>{},
   <Never, Never>{},
-  Stream<Never>.empty(),
+  const Stream<Never>.empty(),
   SplayTreeSet<Never>(),
   SplayTreeMap<Never, Never>(),
 ];
@@ -155,6 +155,7 @@ T? dummyValueOrNull<T>(Object parent, Invocation invocation) {
 T dummyValue<T>(Object parent, Invocation invocation) {
   final value = dummyValueOrNull<T>(parent, invocation);
   if (value is T) return value;
+  // ignore: only_throw_errors
   throw MissingDummyValueError(T);
 }
 

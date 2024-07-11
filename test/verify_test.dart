@@ -74,11 +74,7 @@ void main() {
     mock = _MockedClass();
   });
 
-  tearDown(() {
-    // In some of the tests that expect an Error to be thrown, Mockito's
-    // global state can become invalid. Reset it.
-    resetMockitoState();
-  });
+  tearDown(resetMockitoState);
 
   group('verify', () {
     test('should verify method without args', () {
@@ -184,7 +180,7 @@ void main() {
     });
 
     test('should throw meaningful errors when verification is interrupted', () {
-      int badHelper() => throw 'boo';
+      int badHelper() => throw Exception('boo');
 
       try {
         verify(mock.methodWithNamedArgs(42, y: badHelper()));

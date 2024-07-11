@@ -13,6 +13,8 @@
 // limitations under the License.
 
 @TestOn('vm')
+library;
+
 import 'dart:convert' show utf8;
 
 import 'package:build/build.dart';
@@ -21,7 +23,7 @@ import 'package:mockito/src/builder.dart';
 import 'package:package_config/package_config.dart';
 import 'package:test/test.dart';
 
-Builder buildMocks(BuilderOptions options) => MockBuilder();
+Builder buildMocks(BuilderOptions options) => const MockBuilder();
 
 const annotationsAsset = {
   'mockito|lib/annotations.dart': '''
@@ -81,11 +83,6 @@ void main() {}
 '''
 };
 
-const _constructorWithThrowOnMissingStub = '''
-MockFoo() {
-    _i1.throwOnMissingStub(this);
-  }''';
-
 void main() {
   late InMemoryAssetWriter writer;
 
@@ -97,7 +94,7 @@ void main() {
           packageUriRoot: Uri.file('/foo/lib/'),
           languageVersion: LanguageVersion(3, 3))
     ]);
-    await testBuilder(buildMocks(BuilderOptions({})), sourceAssets,
+    await testBuilder(buildMocks(const BuilderOptions({})), sourceAssets,
         writer: writer, packageConfig: packageConfig);
     final mocksAsset = AssetId('foo', 'test/foo_test.mocks.dart');
     return utf8.decode(writer.assets[mocksAsset]!);
@@ -1755,9 +1752,6 @@ void main() {
   });
 }
 
-TypeMatcher<List<int>> _containsAllOf(a, [b]) => decodedMatches(
-    b == null ? allOf(contains(a)) : allOf(contains(a), contains(b)));
-
 /// Expect that [testBuilder], given [assets], throws an
 /// [InvalidMockitoAnnotationException] with a message containing [message].
 void _expectBuilderThrows({
@@ -1765,8 +1759,9 @@ void _expectBuilderThrows({
   required dynamic /*String|Matcher<List<int>>*/ message,
 }) {
   expect(
-      () async => await testBuilder(buildMocks(BuilderOptions({})), assets),
-      throwsA(TypeMatcher<InvalidMockitoAnnotationException>()
+      () async =>
+          await testBuilder(buildMocks(const BuilderOptions({})), assets),
+      throwsA(const TypeMatcher<InvalidMockitoAnnotationException>()
           .having((e) => e.message, 'message', message)));
 }
 

@@ -42,10 +42,11 @@ import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart' hide refer;
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/src/version.dart';
 import 'package:path/path.dart' as p;
 import 'package:source_gen/source_gen.dart';
+
+import '../annotations.dart';
+import 'version.dart';
 
 /// For a source Dart library, generate the mocks referenced therein.
 ///
@@ -106,31 +107,33 @@ class MockBuilder implements Builder {
       // These comments are added after import directives; leading newlines
       // are necessary. Individual rules are still ignored to preserve backwards
       // compatibility with older versions of Dart.
-      b.body.add(Code('\n\n// ignore_for_file: type=lint\n'));
-      b.body.add(Code('// ignore_for_file: avoid_redundant_argument_values\n'));
+      b.body.add(const Code('\n\n// ignore_for_file: type=lint\n'));
+      b.body.add(
+          const Code('// ignore_for_file: avoid_redundant_argument_values\n'));
       // We might generate a setter without a corresponding getter.
-      b.body.add(Code('// ignore_for_file: avoid_setters_without_getters\n'));
+      b.body.add(
+          const Code('// ignore_for_file: avoid_setters_without_getters\n'));
       // We don't properly prefix imported class names in doc comments.
-      b.body.add(Code('// ignore_for_file: comment_references\n'));
+      b.body.add(const Code('// ignore_for_file: comment_references\n'));
       // We might import a deprecated library, or implement a deprecated class.
-      b.body.add(Code('// ignore_for_file: deprecated_member_use\n'));
-      b.body.add(Code(
+      b.body.add(const Code('// ignore_for_file: deprecated_member_use\n'));
+      b.body.add(const Code(
           '// ignore_for_file: deprecated_member_use_from_same_package\n'));
       // We might import a package's 'src' directory.
-      b.body.add(Code('// ignore_for_file: implementation_imports\n'));
+      b.body.add(const Code('// ignore_for_file: implementation_imports\n'));
       // `Mock.noSuchMethod` is `@visibleForTesting`, but the generated code is
       // not always in a test directory; the Mockito `example/iss` tests, for
       // example.
-      b.body.add(Code(
+      b.body.add(const Code(
           '// ignore_for_file: invalid_use_of_visible_for_testing_member\n'));
-      b.body.add(Code('// ignore_for_file: must_be_immutable\n'));
-      b.body.add(Code('// ignore_for_file: prefer_const_constructors\n'));
+      b.body.add(const Code('// ignore_for_file: must_be_immutable\n'));
+      b.body.add(const Code('// ignore_for_file: prefer_const_constructors\n'));
       // The code_builder `asA` API unconditionally adds defensive parentheses.
-      b.body.add(Code('// ignore_for_file: unnecessary_parenthesis\n'));
+      b.body.add(const Code('// ignore_for_file: unnecessary_parenthesis\n'));
       // The generator appends a suffix to fake classes
-      b.body.add(Code('// ignore_for_file: camel_case_types\n'));
+      b.body.add(const Code('// ignore_for_file: camel_case_types\n'));
       // The generator has to occasionally implement sealed classes
-      b.body.add(Code('// ignore_for_file: subtype_of_sealed_class\n\n'));
+      b.body.add(const Code('// ignore_for_file: subtype_of_sealed_class\n\n'));
       b.body.addAll(mockLibraryInfo.fakeClasses);
       b.body.addAll(mockLibraryInfo.mockClasses);
     });
@@ -329,8 +332,8 @@ class _TypeVisitor extends RecursiveElementVisitor<void> {
       if (!alreadyVisitedElement) {
         type.element.typeParameters.forEach(visitTypeParameterElement);
 
-        final toStringMethod =
-            type.element.lookUpMethod('toString', type.element.library);
+        final toStringMethod = type.element.augmented
+            .lookUpMethod(name: 'toString', library: type.element.library);
         if (toStringMethod != null && toStringMethod.parameters.isNotEmpty) {
           // In a Fake class which implements a class which overrides `toString`
           // with additional (optional) parameters, we must also override
@@ -594,9 +597,7 @@ class _MockTargetGatherer {
     var type = _determineDartType(typeToMock, entryLib.typeProvider);
     final mockTypeArguments = mockType?.typeArguments;
     if (mockTypeArguments != null) {
-      final typeName =
-          type.alias?.element.getDisplayString(withNullability: false) ??
-              'type $type';
+      final typeName = type.alias?.element.getDisplayString() ?? 'type $type';
       final typeArguments = type.alias?.typeArguments ?? type.typeArguments;
       // Check explicit type arguments for unknown types that were
       // turned into `dynamic` by the analyzer.
@@ -1593,7 +1594,7 @@ class _MockClassInfo {
           }
         }
         if (type.returnType is analyzer.VoidType) {
-          b.body = Code('');
+          b.body = const Code('');
         } else {
           b.body = _dummyValue(type.returnType, invocation).code;
         }
@@ -1688,8 +1689,8 @@ class _MockClassInfo {
           ..initializers.add(refer('super')
               .call([refer('parent'), refer('parentInvocation')]).code)));
 
-        final toStringMethod =
-            elementToFake.lookUpMethod('toString', elementToFake.library);
+        final toStringMethod = elementToFake.augmented
+            .lookUpMethod(name: 'toString', library: elementToFake.library);
         if (toStringMethod != null && toStringMethod.parameters.isNotEmpty) {
           // If [elementToFake] includes an overriding `toString` implementation,
           // we need to include an implementation which matches the signature.
@@ -1849,7 +1850,7 @@ class _MockClassInfo {
       // TODO(srawlins): It seems like this might be revivable, but Angular
       // does not revive Types; we should investigate this if users request it.
       final type = object.toTypeValue()!;
-      final typeStr = type.getDisplayString(withNullability: false);
+      final typeStr = type.getDisplayString();
       throw _ReviveException('default value is a Type: $typeStr.');
     } else {
       // If [constant] is not null, a literal, or a type, then it must be an
@@ -2177,7 +2178,7 @@ class _MockClassInfo {
         ..isNullable = forceNullable || typeSystem.isNullable(type));
     } else {
       return referImported(
-        type.getDisplayString(withNullability: false),
+        type.getDisplayString(),
         _typeImport(type.element),
       );
     }
@@ -2286,7 +2287,7 @@ class _AvoidConflictsAllocator implements Allocator {
 /// A [MockBuilder] instance for use by `build.yaml`.
 Builder buildMocks(BuilderOptions options) {
   final buildExtensions = options.config['build_extensions'];
-  if (buildExtensions == null) return MockBuilder();
+  if (buildExtensions == null) return const MockBuilder();
   if (buildExtensions is! Map) {
     throw ArgumentError(
         'build_extensions should be a map from inputs to outputs');

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unreachable_from_main, inference_failure_on_function_invocation
+
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -84,11 +86,7 @@ void main() {
     mock = MockedClass();
   });
 
-  tearDown(() {
-    // In some of the tests that expect an Error to be thrown, Mockito's
-    // global state can become invalid. Reset it.
-    resetMockitoState();
-  });
+  tearDown(resetMockitoState);
 
   group('when()', () {
     test(
@@ -99,14 +97,14 @@ void main() {
       expect(
           () => when(mock.notMockedNonNullableParam((any as dynamic) as int))
               .thenReturn('Mock'),
-          throwsA(TypeMatcher<TypeError>()));
+          throwsA(const TypeMatcher<TypeError>()));
     });
 
     test(
         'cannot operate on method with non-nullable return type without a '
         'manual mock', () {
       expect(() => when(mock.notMockedNonNullableReturn()).thenReturn(7),
-          throwsA(TypeMatcher<TypeError>()));
+          throwsA(const TypeMatcher<TypeError>()));
     });
 
     test('should mock method with non-nullable params', () {
@@ -169,8 +167,8 @@ void main() {
     test(
         'should throw a TypeError on a call to a function with a non-nullable '
         'return type without a matching stub', () {
-      expect(
-          () => mock.nonNullableReturn(43), throwsA(TypeMatcher<TypeError>()));
+      expect(() => mock.nonNullableReturn(43),
+          throwsA(const TypeMatcher<TypeError>()));
     });
 
     test(
@@ -178,7 +176,7 @@ void main() {
         'using `throwOnMissingStub` behavior', () {
       throwOnMissingStub(mock);
       expect(() => mock.nonNullableReturn(43),
-          throwsA(TypeMatcher<MissingStubError>()));
+          throwsA(const TypeMatcher<MissingStubError>()));
     });
   });
 

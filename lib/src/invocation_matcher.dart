@@ -14,7 +14,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:matcher/matcher.dart';
-import 'package:mockito/src/mock.dart';
+import 'mock.dart';
 
 /// Returns a matcher that expects an invocation that matches arguments given.
 ///
@@ -130,7 +130,7 @@ class _InvocationMatcher implements Matcher {
   // Specifically, if a Matcher is passed as an argument, we'd like to get an
   // error like "Expected fly(miles: > 10), Actual: fly(miles: 5)".
   @override
-  Description describeMismatch(item, Description d, _, __) {
+  Description describeMismatch(dynamic item, Description d, _, __) {
     if (item is Invocation) {
       d = d.add('Does not match ');
       return _describeInvocation(d, item);
@@ -139,7 +139,7 @@ class _InvocationMatcher implements Matcher {
   }
 
   @override
-  bool matches(item, _) =>
+  bool matches(dynamic item, _) =>
       item is Invocation &&
       _invocation.memberName == item.memberName &&
       _invocation.isSetter == item.isSetter &&
@@ -156,7 +156,7 @@ class _MatcherEquality extends DeepCollectionEquality /* <Matcher | E> */ {
   const _MatcherEquality();
 
   @override
-  bool equals(e1, e2) {
+  bool equals(Object? e1, Object? e2) {
     // All argument matches are wrapped in `ArgMatcher`, so we have to unwrap
     // them into the raw `Matcher` type in order to finish our equality checks.
     if (e1 is ArgMatcher) {

@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_function_invocation, inference_failure_on_instance_creation
+
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -42,11 +44,7 @@ void main() {
       fooSub = MockFooSub();
     });
 
-    tearDown(() {
-      // In some of the tests that expect an Error to be thrown, Mockito's
-      // global state can become invalid. Reset it.
-      resetMockitoState();
-    });
+    tearDown(resetMockitoState);
 
     test('a method with a positional parameter can be stubbed', () {
       when(foo.positionalParameter(42)).thenReturn('Stubbed');
@@ -150,15 +148,17 @@ void main() {
       when(foo.namedParameter(x: 42)).thenReturn('Stubbed');
       expect(
         () => foo.namedParameter(x: 43),
-        throwsA(TypeMatcher<MissingStubError>().having((e) => e.toString(),
-            'toString()', contains('namedParameter({x: 43})'))),
+        throwsA(const TypeMatcher<MissingStubError>().having(
+            (e) => e.toString(),
+            'toString()',
+            contains('namedParameter({x: 43})'))),
       );
     });
 
     test('an unstubbed getter throws', () {
       expect(
         () => foo.getter,
-        throwsA(TypeMatcher<MissingStubError>()
+        throwsA(const TypeMatcher<MissingStubError>()
             .having((e) => e.toString(), 'toString()', contains('getter'))),
       );
     });
@@ -192,7 +192,7 @@ void main() {
       baz = MockBazWithUnsupportedMembers<Bar>();
     });
 
-    tearDown(() => resetMockitoState());
+    tearDown(resetMockitoState);
 
     test('a real method call that returns private type throws', () {
       expect(() => baz.returnsPrivate(), throwsUnsupportedError);
@@ -311,15 +311,13 @@ void main() {
       when(foo.returnsBar(42)).thenReturn(Bar());
       final bar = foo.returnsBar(43);
       expect(
-          () => bar.f(),
+          bar.f,
           throwsA(isA<FakeUsedError>().having(
               (e) => e.toString(), 'toString()', contains('returnsBar(43)'))));
     });
     group('a method returning Future<T>', () {
       final bar = Bar();
-      tearDown(() {
-        resetMockitoState();
-      });
+      tearDown(resetMockitoState);
       test('returns a fake future if unstubbed', () {
         expect(foo.returnsFuture(bar), isA<SmartFake>());
       });

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unreachable_from_main
+
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -68,11 +70,7 @@ void main() {
     mock = _MockedClass();
   });
 
-  tearDown(() {
-    // In some of the tests that expect an Error to be thrown, Mockito's
-    // global state can become invalid. Reset it.
-    resetMockitoState();
-  });
+  tearDown(resetMockitoState);
 
   group('mixin support', () {
     test('should work', () {
@@ -297,7 +295,7 @@ void main() {
       when(mock.methodWithNormalArgs(42)).thenReturn('Ultimate Answer');
       expect(
         () => mock.methodWithoutArgs(),
-        throwsA(TypeMatcher<MissingStubError>()),
+        throwsA(const TypeMatcher<MissingStubError>()),
       );
     });
 

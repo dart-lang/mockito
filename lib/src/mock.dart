@@ -22,11 +22,12 @@ import 'dart:collection';
 
 import 'package:matcher/expect.dart';
 import 'package:meta/meta.dart';
-import 'package:mockito/src/call_pair.dart';
-import 'package:mockito/src/dummies.dart' show resetDummyBuilders;
-import 'package:mockito/src/invocation_matcher.dart';
 // ignore: deprecated_member_use
 import 'package:test_api/fake.dart';
+
+import 'call_pair.dart';
+import 'dummies.dart' show resetDummyBuilders;
+import 'invocation_matcher.dart';
 
 /// Whether a [when] call is "in progress."
 ///
@@ -195,7 +196,7 @@ mixin class Mock {
   int get hashCode => _givenHashCode ?? 0;
 
   @override
-  bool operator ==(other) => (_givenHashCode != null && other is Mock)
+  bool operator ==(Object other) => (_givenHashCode != null && other is Mock)
       ? _givenHashCode == other._givenHashCode
       : identical(this, other);
 
@@ -392,8 +393,7 @@ class _InvocationForMatchedArguments extends Invocation {
   // by a stored value in [_storedNamedArgs].
   static Map<Symbol, dynamic> _reconstituteNamedArgs(Invocation invocation) {
     final namedArguments = <Symbol, dynamic>{};
-    final storedNamedArgSymbols =
-        _storedNamedArgs.keys.map((name) => Symbol(name));
+    final storedNamedArgSymbols = _storedNamedArgs.keys.map(Symbol.new);
 
     // Iterate through [invocation]'s named args, validate them, and add them
     // to the return map.
@@ -509,13 +509,13 @@ T named<T extends Mock>(T mock, {String? name, int? hashCode}) => mock
   .._givenHashCode = hashCode;
 
 /// Clear stubs of, and collected interactions with [mock].
-void reset(var mock) {
+void reset(Mock mock) {
   mock._realCalls.clear();
   mock._responses.clear();
 }
 
 /// Clear the collected interactions with [mock].
-void clearInteractions(var mock) {
+void clearInteractions(Mock mock) {
   mock._realCalls.clear();
 }
 
@@ -557,6 +557,7 @@ class PostExpectation<T> {
   /// Store an exception to throw when this method stub is called.
   void thenThrow(Object throwable) {
     return _completeWhen((Invocation _) {
+      // ignore: only_throw_errors
       throw throwable;
     });
   }
@@ -668,7 +669,7 @@ class InvocationMatcher {
     return true;
   }
 
-  bool isMatchingArg(roleArg, actArg) {
+  bool isMatchingArg(dynamic roleArg, dynamic actArg) {
     if (roleArg is ArgMatcher) {
       return roleArg.matcher.matches(actArg, {});
     } else {
@@ -967,7 +968,6 @@ class VerificationResult {
   @Deprecated(
       'captured should be considered final - assigning this field may be '
       'removed as early as Mockito 5.0.0')
-  // ignore: unnecessary_getters_setters
   set captured(List<dynamic> captured) => _captured = captured;
 
   /// The number of calls matched in this verification.
@@ -1133,6 +1133,7 @@ List<VerificationResult> Function<T>(List<T> recordedInvocations)
         matchedCalls.add(matched.realCall);
         verificationResults.add(VerificationResult._(1, matched.capturedArgs));
         time = matched.realCall.timeStamp;
+        // ignore: avoid_catching_errors
       } on StateError {
         final mocks = tmpVerifyCalls.map((vc) => vc.mock).toSet();
         final allInvocations =
@@ -1154,14 +1155,14 @@ List<VerificationResult> Function<T>(List<T> recordedInvocations)
   };
 }
 
-void _throwMockArgumentError(String method, var nonMockInstance) {
+void _throwMockArgumentError(String method, dynamic nonMockInstance) {
   if (nonMockInstance == null) {
     throw ArgumentError('$method was called with a null argument');
   }
   throw ArgumentError('$method must only be given a Mock object');
 }
 
-void verifyNoMoreInteractions(var mock) {
+void verifyNoMoreInteractions(dynamic mock) {
   if (mock is Mock) {
     final unverified = mock._realCalls.where((inv) => !inv.verified).toList();
     if (unverified.isNotEmpty) {
@@ -1172,7 +1173,7 @@ void verifyNoMoreInteractions(var mock) {
   }
 }
 
-void verifyZeroInteractions(var mock) {
+void verifyZeroInteractions(dynamic mock) {
   if (mock is Mock) {
     if (mock._realCalls.isNotEmpty) {
       fail('No interaction expected, but following found: '

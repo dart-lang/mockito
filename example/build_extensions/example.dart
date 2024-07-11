@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unreachable_from_main
+
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test_api/scaffolding.dart';
@@ -30,7 +32,7 @@ class Dog {
 @GenerateNiceMocks([MockSpec<Dog>()])
 void main() {
   test('Verify some dog behaviour', () async {
-    MockDog mockDog = MockDog();
+    var mockDog = MockDog();
     when(mockDog.eatFood(any));
 
     mockDog.eatFood('biscuits');
