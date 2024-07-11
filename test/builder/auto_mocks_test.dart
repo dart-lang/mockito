@@ -13,6 +13,8 @@
 // limitations under the License.
 
 @TestOn('vm')
+library;
+
 import 'dart:convert' show utf8;
 
 import 'package:build/build.dart';
@@ -101,7 +103,7 @@ void main() {
           languageVersion: LanguageVersion(3, 3))
     ]);
 
-    await testBuilder(buildMocks(BuilderOptions({})), sourceAssets,
+    await testBuilder(buildMocks(const BuilderOptions({})), sourceAssets,
         writer: writer, packageConfig: packageConfig);
     final mocksAsset = AssetId('foo', 'test/foo_test.mocks.dart');
     return utf8.decode(writer.assets[mocksAsset]!);
@@ -3753,7 +3755,7 @@ void main() {
   });
 }
 
-TypeMatcher<List<int>> _containsAllOf(a, [b]) => decodedMatches(
+TypeMatcher<List<int>> _containsAllOf(Object? a, [Object? b]) => decodedMatches(
     b == null ? allOf(contains(a)) : allOf(contains(a), contains(b)));
 
 /// Expect that [testBuilder], given [assets], in a package which has opted into
@@ -3774,13 +3776,13 @@ void _expectBuilderThrows({
   expect(
       () => withEnabledExperiments(
             () => testBuilder(
-              buildMocks(BuilderOptions({})),
+              buildMocks(const BuilderOptions({})),
               assets,
               packageConfig: packageConfig,
             ),
             enabledExperiments,
           ),
-      throwsA(TypeMatcher<InvalidMockitoAnnotationException>()
+      throwsA(const TypeMatcher<InvalidMockitoAnnotationException>()
           .having((e) => e.message, 'message', message)));
 }
 

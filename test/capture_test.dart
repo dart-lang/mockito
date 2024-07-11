@@ -34,11 +34,7 @@ void main() {
     mock = _MockedClass();
   });
 
-  tearDown(() {
-    // In some of the tests that expect an Error to be thrown, Mockito's
-    // global state can become invalid. Reset it.
-    resetMockitoState();
-  });
+  tearDown(resetMockitoState);
 
   group('capture', () {
     test('captureAny should match anything', () {

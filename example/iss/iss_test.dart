@@ -27,8 +27,8 @@ void main() {
   // verify the calculated distance between them.
   group('Spherical distance', () {
     test('London - Paris', () {
-      final london = Point(51.5073, -0.1277);
-      final paris = Point(48.8566, 2.3522);
+      final london = const Point(51.5073, -0.1277);
+      final paris = const Point(48.8566, 2.3522);
       final d = sphericalDistanceKm(london, paris);
       // London should be approximately 343.5km
       // (+/- 0.1km) from Paris.
@@ -36,8 +36,8 @@ void main() {
     });
 
     test('San Francisco - Mountain View', () {
-      final sf = Point(37.783333, -122.416667);
-      final mtv = Point(37.389444, -122.081944);
+      final sf = const Point(37.783333, -122.416667);
+      final mtv = const Point(37.389444, -122.081944);
       final d = sphericalDistanceKm(sf, mtv);
       // San Francisco should be approximately 52.8km
       // (+/- 0.1km) from Mountain View.
@@ -52,8 +52,8 @@ void main() {
   // second predefined location. This test runs asynchronously.
   group('ISS spotter', () {
     test('ISS visible', () async {
-      final sf = Point(37.783333, -122.416667);
-      final mtv = Point(37.389444, -122.081944);
+      final sf = const Point(37.783333, -122.416667);
+      final mtv = const Point(37.389444, -122.081944);
       final IssLocator locator = MockIssLocator();
       // Mountain View should be visible from San Francisco.
       when(locator.currentPosition).thenReturn(sf);
@@ -63,8 +63,8 @@ void main() {
     });
 
     test('ISS not visible', () async {
-      final london = Point(51.5073, -0.1277);
-      final mtv = Point(37.389444, -122.081944);
+      final london = const Point(51.5073, -0.1277);
+      final mtv = const Point(37.389444, -122.081944);
       final IssLocator locator = MockIssLocator();
       // London should not be visible from Mountain View.
       when(locator.currentPosition).thenReturn(london);

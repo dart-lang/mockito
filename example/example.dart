@@ -1,3 +1,5 @@
+// ignore_for_file: unreachable_from_main
+
 import 'dart:async';
 
 import 'package:mockito/annotations.dart';
@@ -229,7 +231,7 @@ void main() {
     final cat = FakeCat();
 
     cat.eatFood('Milk'); // Prints 'Fake eat Milk'.
-    expect(() => cat.sleep(), throwsUnimplementedError);
+    expect(cat.sleep, throwsUnimplementedError);
   });
 
   test('Relaxed mock class', () {
