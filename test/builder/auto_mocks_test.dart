@@ -3610,6 +3610,8 @@ void main() {
 
         expect(mocksContent, contains('class MockFoo extends _i1.Mock'));
         expect(mocksContent, contains('implements _i2.Foo'));
+        expect(mocksContent, contains('_i2.BarDef get t1'));
+        expect(mocksContent, contains('_i2.BarDef2 get t2'));
       });
     });
 
