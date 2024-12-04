@@ -21,6 +21,8 @@ import 'package:mockito/src/builder.dart';
 import 'package:package_config/package_config.dart';
 import 'package:test/test.dart';
 
+import 'contains_ignoring_formatting.dart';
+
 Builder buildMocks(BuilderOptions options) => MockBuilder();
 
 const annotationsAsset = {
@@ -441,8 +443,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  m() => throw UnsupportedError(\n'
-            '      r\'"m" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('m() => throw UnsupportedError('
+            'r\'"m" cannot be used without a mockito fallback generator.\''));
   });
 
   test('generates mock getters with private types, given unsupportedMembers',
@@ -467,8 +469,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  get f => throw UnsupportedError(\n'
-            '      r\'"f" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('get f => throw UnsupportedError('
+            'r\'"f" cannot be used without a mockito fallback generator.\''));
   });
 
   test('generates mock setters with private types, given unsupportedMembers',
@@ -493,8 +495,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  set f(value) => throw UnsupportedError(\n'
-            '      r\'"f=" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('set f(value) => throw UnsupportedError('
+            'r\'"f=" cannot be used without a mockito fallback generator.\''));
   });
 
   test(
@@ -520,8 +522,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  m() => throw UnsupportedError(\n'
-            '      r\'"m" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('m() => throw UnsupportedError('
+            'r\'"m" cannot be used without a mockito fallback generator.\''));
   });
 
   test(
@@ -547,8 +549,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  m() => throw UnsupportedError(\n'
-            '      r\'"m" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('m() => throw UnsupportedError('
+            'r\'"m" cannot be used without a mockito fallback generator.\''));
   });
 
   test(
@@ -574,8 +576,8 @@ void main() {
     });
     expect(
         mocksContent,
-        contains('  void m(b) => throw UnsupportedError(\n'
-            '      r\'"m" cannot be used without a mockito fallback generator.\');'));
+        containsIgnoringFormatting('void m(b) => throw UnsupportedError('
+            'r\'"m" cannot be used without a mockito fallback generator.\''));
   });
 
   test(
@@ -629,21 +631,16 @@ void main() {
         void main() {}
         '''
     });
-    expect(mocksContent, contains('''
-        returnValue: _FakeBar_0(
-          this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),
+
+    expect(
+      mocksContent,
+      containsIgnoringFormatting('''
+        returnValue: _FakeBar_0(this, Invocation.method(#m, [])),
         returnValueForMissingStub: _FakeBar_0(
           this,
-          Invocation.method(
-            #m,
-            [],
-          ),
-        ),'''));
+          Invocation.method(#m, []),
+        )'''),
+    );
   });
 
   test('generates mock classes including a fallback generator for a getter',
@@ -672,7 +669,7 @@ void main() {
         void main() {}
         '''
     });
-    expect(mocksContent, contains('returnValue: _i3.fShim(),'));
+    expect(mocksContent, contains('returnValue: _i3.fShim()'));
   });
 
   test(

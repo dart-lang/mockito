@@ -22,6 +22,8 @@ import 'package:mockito/src/builder.dart';
 import 'package:package_config/package_config.dart';
 import 'package:test/test.dart';
 
+import 'contains_ignoring_formatting.dart';
+
 const annotationsAsset = {
   'mockito|lib/annotations.dart': '''
 class GenerateMocks {
@@ -1362,7 +1364,6 @@ void main() {
   test('prefixes parameter type on generic function-typed parameter', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
-      import 'dart:async';
       class Foo {
         dynamic m(void Function(Foo f) a) {}
       }
@@ -1375,7 +1376,6 @@ void main() {
   test('prefixes return type on generic function-typed parameter', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
-      import 'dart:async';
       class Foo {
         void m(Foo Function() a) {}
       }
@@ -1387,7 +1387,6 @@ void main() {
   test('prefixes parameter type on function-typed parameter', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
-      import 'dart:async';
       class Foo {
         void m(void a(Foo f)) {}
       }
@@ -1400,12 +1399,25 @@ void main() {
   test('prefixes return type on function-typed parameter', () async {
     await expectSingleNonNullableOutput(
       dedent(r'''
-      import 'dart:async';
       class Foo {
         void m(Foo a()) {}
       }
       '''),
       _containsAllOf('void m(_i2.Foo Function()? a) => super.noSuchMethod('),
+    );
+  });
+
+  test('renames wildcard parameters', () async {
+    await expectSingleNonNullableOutput(
+      dedent(r'''
+      class Foo {
+        void m(int _, int _) {}
+      }
+      '''),
+      _containsAllOf(
+        'void m(int? _0, int? _1) => super.noSuchMethod(Invocation.method(',
+        'Invocation.method(#m, [_0, _1])',
+      ),
     );
   });
 
@@ -2044,6 +2056,23 @@ void main() {
     );
   });
 
+  test('overrides nullable instance setters with wildcard parameters',
+      () async {
+    await expectSingleNonNullableOutput(
+      dedent('''
+      class Foo {
+        void set m(int? _) {}
+      }
+      '''),
+      _containsAllOf(dedent2('''
+        set m(int? _value) => super.noSuchMethod(
+              Invocation.setter(#m, _value),
+              returnValueForMissingStub: null,
+            );
+        ''')),
+    );
+  });
+
   test('overrides inherited non-nullable instance setters', () async {
     await expectSingleNonNullableOutput(
       dedent('''
@@ -2250,7 +2279,7 @@ void main() {
         bool m() => false;
       }
       '''),
-      _containsAllOf('returnValue: false,'),
+      _containsAllOf('returnValue: false'),
     );
   });
 
@@ -2261,7 +2290,7 @@ void main() {
         double m() => 3.14;
       }
       '''),
-      _containsAllOf('returnValue: 0.0,'),
+      _containsAllOf('returnValue: 0.0'),
     );
   });
 
@@ -2272,7 +2301,7 @@ void main() {
         int m() => 7;
       }
       '''),
-      _containsAllOf('returnValue: 0,'),
+      _containsAllOf('returnValue: 0'),
     );
   });
 
@@ -2295,7 +2324,7 @@ void main() {
         List<Foo> m() => [Foo()];
       }
       '''),
-      _containsAllOf('returnValue: <_i2.Foo>[],'),
+      _containsAllOf('returnValue: <_i2.Foo>[]'),
     );
   });
 
@@ -2306,7 +2335,7 @@ void main() {
         Set<Foo> m() => {Foo()};
       }
       '''),
-      _containsAllOf('returnValue: <_i2.Foo>{},'),
+      _containsAllOf('returnValue: <_i2.Foo>{}'),
     );
   });
 
@@ -2317,7 +2346,7 @@ void main() {
         Map<int, Foo> m() => {7: Foo()};
       }
       '''),
-      _containsAllOf('returnValue: <int, _i2.Foo>{},'),
+      _containsAllOf('returnValue: <int, _i2.Foo>{}'),
     );
   });
 
@@ -2328,7 +2357,7 @@ void main() {
         Map m();
       }
       '''),
-      _containsAllOf('returnValue: <dynamic, dynamic>{},'),
+      _containsAllOf('returnValue: <dynamic, dynamic>{}'),
     );
   });
 
@@ -2339,7 +2368,7 @@ void main() {
         Future<bool> m() async => false;
       }
       '''),
-      _containsAllOf('returnValue: _i3.Future<bool>.value(false),'),
+      _containsAllOf('returnValue: _i3.Future<bool>.value(false)'),
     );
   });
 
@@ -2362,7 +2391,7 @@ void main() {
         Stream<int> m();
       }
       '''),
-      _containsAllOf('returnValue: _i3.Stream<int>.empty(),'),
+      _containsAllOf('returnValue: _i3.Stream<int>.empty()'),
     );
   });
 
@@ -2384,7 +2413,7 @@ void main() {
             #m,
             [],
           ),
-        ),'''),
+        )'''),
     );
   });
 
@@ -2403,7 +2432,7 @@ void main() {
             #m,
             [],
           ),
-        ),'''),
+        )'''),
     );
   });
 
@@ -2418,7 +2447,7 @@ void main() {
         two,
       }
       '''),
-      _containsAllOf('returnValue: _i2.Bar.one,'),
+      _containsAllOf('returnValue: _i2.Bar.one'),
     );
   });
 
@@ -2435,7 +2464,7 @@ void main() {
         returnValue: (
           int __p0, [
           String? __p1,
-        ]) {},'''),
+        ]) {}'''),
     );
   });
 
@@ -2452,7 +2481,7 @@ void main() {
         returnValue: (
           _i2.Foo __p0, {
           bool? b,
-        }) {},'''),
+        }) {}'''),
     );
   });
 
@@ -2469,7 +2498,7 @@ void main() {
         returnValue: (
           _i2.Foo __p0, {
           required bool b,
-        }) {},'''),
+        }) {}'''),
     );
   });
 
@@ -2489,7 +2518,7 @@ void main() {
             #m,
             [],
           ),
-        ),'''),
+        )'''),
     );
   });
 
@@ -2510,7 +2539,7 @@ void main() {
             #m,
             [],
           ),
-        ),
+        )
       '''),
     );
   });
@@ -2523,7 +2552,7 @@ void main() {
         T? Function<T>(T) m() => (int i, [String s]) {};
       }
       '''),
-      _containsAllOf('returnValue: <T>(T __p0) => null,'),
+      _containsAllOf('returnValue: <T>(T __p0) => null'),
     );
   });
 
@@ -3861,8 +3890,10 @@ void main() {
   });
 }
 
-TypeMatcher<List<int>> _containsAllOf(a, [b]) => decodedMatches(
-    b == null ? allOf(contains(a)) : allOf(contains(a), contains(b)));
+TypeMatcher<List<int>> _containsAllOf(String a, [String? b]) =>
+    decodedMatches(b == null
+        ? containsIgnoringFormatting(a)
+        : allOf(containsIgnoringFormatting(a), containsIgnoringFormatting(b)));
 
 /// Expect that [testBuilder], given [assets], in a package which has opted into
 /// null safety, throws an [InvalidMockitoAnnotationException] with a message
