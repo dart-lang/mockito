@@ -1866,7 +1866,7 @@ class _MockClassInfo {
           _dummyFakedValue(dartType, invocation),
         ExtensionTypeElement2(:final typeErasure)
             when !typeErasure.containsPrivateName =>
-          _dummyValue(typeErasure, invocation),
+          _dummyValue(typeErasure, invocation).asA(_typeReference(dartType)),
         ExtensionTypeElement2() => _dummyValueFallbackToRuntime(
             dartType,
             invocation,
