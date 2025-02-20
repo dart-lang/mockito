@@ -4180,14 +4180,26 @@ void main() {
 
     test('are supported as return types', () async {
       await expectSingleNonNullableOutput(
-        dedent('''
+          dedent('''
         extension type E(int v) {}
         class Foo {
           E get v;
         }
         '''),
-        decodedMatches(allOf(contains('E get v'), contains('returnValue: 0'))),
-      );
+          decodedMatches(allOf(
+              contains('E get v'), contains('returnValue: (0 as _i2.E)'))));
+    });
+
+    test('are supported as Future return types', () async {
+      await expectSingleNonNullableOutput(
+          dedent('''
+        extension type E(int v) {}
+        class Foo {
+          Future<E> get v;
+        }
+        '''),
+          decodedMatches(allOf(contains('_i3.Future<_i2.E> get v'),
+              contains('returnValue: _i3.Future<_i2.E>.value((0 as _i2.E))'))));
     });
   });
   group('build_extensions support', () {

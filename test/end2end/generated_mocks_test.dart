@@ -365,6 +365,15 @@ void main() {
         expect(usesExtTypes.extTypeReturn(2), equals(Ext(42)));
         expect(usesExtTypes.extTypeReturn(42), equals(Ext(0)));
       });
+
+      test('a method using extension type as a return type can be stubbed',
+          () async {
+        when(usesExtTypes.futureExtTypeReturn(2))
+            .thenAnswer((_) => Future.value(Ext(42)));
+        expect(await usesExtTypes.futureExtTypeReturn(2), equals(Ext(42)));
+        expect(await usesExtTypes.futureExtTypeReturn(42), equals(Ext(0)));
+        expect(await usesExtTypes.futureExtTypeReturn(42), equals(0));
+      });
     });
   });
 

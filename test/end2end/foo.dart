@@ -74,4 +74,7 @@ class UsesExtTypes {
   Ext extTypeReturn(int _) => Ext(42);
   bool privateExtTypeArg(ExtOfPrivate _) => true;
   ExtOfPrivate privateExtTypeReturn(int _) => ExtOfPrivate(private);
+  Future<Ext> futureExtTypeReturn(int _) => Future.value(Ext(43));
+  Future<ExtOfPrivate> futureExtOfPrivateTypeReturn(int _) =>
+      Future.value(ExtOfPrivate(private));
 }
