@@ -1256,7 +1256,6 @@ class _MockClassInfo {
         typeAlias?.element2.aliasedType as analyzer.InterfaceType?;
     final typeToMock = aliasedType ?? mockTarget.classType;
     final classToMock = mockTarget.interfaceElement;
-    final classIsImmutable = classToMock.metadata.any((it) => it.isImmutable);
     final className = aliasedElement?.name3 ?? classToMock.name3;
 
     return Class((cBuilder) {
