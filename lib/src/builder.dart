@@ -1259,7 +1259,6 @@ class _MockClassInfo {
         typeAlias?.element2.aliasedType as analyzer.InterfaceType?;
     final typeToMock = aliasedType ?? mockTarget.classType;
     final classToMock = mockTarget.interfaceElement;
-    final classIsImmutable = classToMock.metadata.any((it) => it.isImmutable);
     final className = aliasedElement?.name3 ?? classToMock.name3;
 
     return Class((cBuilder) {
@@ -1274,9 +1273,7 @@ class _MockClassInfo {
           '/// See the documentation for Mockito\'s code generation '
           'for more information.',
         );
-      if (classIsImmutable) {
-        cBuilder.docs.add('// ignore: must_be_immutable');
-      }
+
       // For each type parameter on [classToMock], the Mock class needs a type
       // parameter with same type variables, and a mirrored type argument for
       // the "implements" clause.
