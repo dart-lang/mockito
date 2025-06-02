@@ -16,7 +16,6 @@ import 'dart:collection';
 
 import 'package:analyzer/dart/ast/ast.dart' as ast;
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart' as analyzer;
@@ -33,8 +32,6 @@ import 'package:analyzer/src/dart/element/inheritance_manager3.dart'
 import 'package:analyzer/src/dart/element/member.dart' show ExecutableMember;
 // ignore: implementation_imports
 import 'package:analyzer/src/dart/element/type_algebra.dart' show Substitution;
-// ignore: implementation_imports
-import 'package:analyzer/src/utilities/extensions/element.dart';
 import 'package:build/build.dart';
 // Do not expose [refer] in the default namespace.
 //
@@ -77,7 +74,7 @@ class MockBuilder implements Builder {
   @override
   Future<void> build(BuildStep buildStep) async {
     if (!await buildStep.resolver.isLibrary(buildStep.inputId)) return;
-    final entryLib = await buildStep.inputLibrary2;
+    final entryLib = await buildStep.inputLibrary;
     final sourceLibIsNonNullable = true;
 
     final mockLibraryAsset = buildStep.allowedOutputs.singleOrNull;
@@ -244,7 +241,7 @@ $rawOutput
       final exportingLibrary = _findExportOf(librariesWithTypes, element);
 
       try {
-        final typeAssetId = await resolver.assetIdForElement2(exportingLibrary);
+        final typeAssetId = await resolver.assetIdForElement(exportingLibrary);
 
         if (typeAssetId.path.startsWith('lib/')) {
           typeUris[element] = typeAssetId.uri.toString();
@@ -1256,6 +1253,9 @@ class _MockClassInfo {
         typeAlias?.element2.aliasedType as analyzer.InterfaceType?;
     final typeToMock = aliasedType ?? mockTarget.classType;
     final classToMock = mockTarget.interfaceElement;
+    final classIsImmutable = classToMock.metadata2.annotations.any(
+      (it) => it.isImmutable,
+    );
     final className = aliasedElement?.name3 ?? classToMock.name3;
 
     return Class((cBuilder) {
