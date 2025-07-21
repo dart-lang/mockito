@@ -1247,16 +1247,15 @@ class _MockClassInfo {
   });
 
   Class _buildMockClass() {
-    final typeAlias = mockTarget.classType.alias;
-    final aliasedElement = typeAlias?.element2;
-    final aliasedType =
-        typeAlias?.element2.aliasedType as analyzer.InterfaceType?;
+    final instantiatedAlias = mockTarget.classType.alias;
+    final aliasElement = instantiatedAlias?.element2;
+    final aliasedType = aliasElement?.aliasedType as analyzer.InterfaceType?;
     final typeToMock = aliasedType ?? mockTarget.classType;
     final classToMock = mockTarget.interfaceElement;
     final classIsImmutable = classToMock.metadata2.annotations.any(
       (it) => it.isImmutable,
     );
-    final className = aliasedElement?.name3 ?? classToMock.name3;
+    final className = aliasElement?.name3 ?? classToMock.name3;
 
     return Class((cBuilder) {
       cBuilder
@@ -1278,9 +1277,9 @@ class _MockClassInfo {
       // the "implements" clause.
 
       final typeParameters =
-          aliasedElement?.typeParameters2 ?? classToMock.typeParameters2;
+          aliasElement?.typeParameters2 ?? classToMock.typeParameters2;
       final typeArguments =
-          typeAlias?.typeArguments ?? typeToMock.typeArguments;
+          instantiatedAlias?.typeArguments ?? typeToMock.typeArguments;
 
       _withTypeParameters(
         mockTarget.hasExplicitTypeArguments ? [] : typeParameters,
@@ -1300,7 +1299,7 @@ class _MockClassInfo {
             TypeReference((b) {
               b
                 ..symbol = className
-                ..url = _typeImport(aliasedElement ?? classToMock)
+                ..url = _typeImport(aliasElement ?? classToMock)
                 ..types.addAll(
                   mockTarget.hasExplicitTypeArguments
                       ? typeArguments.map(_typeReference)
@@ -1313,11 +1312,8 @@ class _MockClassInfo {
           }
 
           final substitution = Substitution.fromPairs2(
-            [
-              ...classToMock.typeParameters2,
-              ...?aliasedElement?.typeParameters2,
-            ],
-            [...typeToMock.typeArguments, ...?typeAlias?.typeArguments],
+            [...classToMock.typeParameters2, ...?aliasElement?.typeParameters2],
+            [...typeToMock.typeArguments, ...?instantiatedAlias?.typeArguments],
           );
           final members = inheritanceManager
               .getInterface2(classToMock)
