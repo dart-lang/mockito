@@ -1,6 +1,7 @@
 ## 5.4.7-wip
 
 * Require Dart SDK ^3.7.0.
+* Require `analyzer: >=7.7.1 <9.0.0`.
 
 ## 5.4.6
 
